@@ -1,8 +1,7 @@
 /**
- * Course: COSC 3P71 - Assignment 2
- * Project Chess
- * Name: Graham Burgsma
- * Date: December 2014
+ * Project: Chess
+ * Course: COSC 3P71 - Final Project
+ * Created: December, 2014
  */
 public class MoveEngine {
 
@@ -33,7 +32,7 @@ public class MoveEngine {
 
 	private boolean pawnCheck(Piece piece, Location toLocation) {
 		int black = piece.getColour() == Colour.BLACK ? -1 : 1; //if black then the checks are negated, else are positive
-		Piece endPiece = board.getPiece(toLocation.getX(), toLocation.getY());
+		Piece endPiece = board.getCurrentState().getPiece(toLocation.getX(), toLocation.getY());
 
 				/*For the first move
 				* Can either jump 1 or 2 spaces
@@ -55,7 +54,7 @@ public class MoveEngine {
 	private boolean knightCheck(Piece piece, Location toLocation) {
 		System.out.println("No. of active thread: " + Thread.activeCount());
 
-		Piece endPiece = board.getPiece(toLocation.getX(), toLocation.getY());
+		Piece endPiece = board.getCurrentState().getPiece(toLocation.getX(), toLocation.getY());
 
 		/*Checks all the x positions first, then checks the y positions
 		* inside the if statement.

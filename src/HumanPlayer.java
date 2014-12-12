@@ -7,10 +7,9 @@ import java.awt.event.MouseListener;
 
 
 /**
- * Course: COSC 3P71 - Assignment 2
- * Project Chess
- * Name: Graham Burgsma
- * Date: December 2014
+ * Project: Chess
+ * Course: COSC 3P71 - Final Project
+ * Created: December, 2014
  */
 public class HumanPlayer {
 
@@ -118,11 +117,11 @@ public class HumanPlayer {
 				                     }
 				                     if (row != -1 && column != -1) {  //if row/column has actually been clicked
 					                     if (e.getButton() == MouseEvent.BUTTON1) { //left click
-						                     if (board.getPiece(column, row) != null && board.getPiece(column, row).getColour() == getColour()) { //if its not an empty selection and the right colour is selected
-							                     selected = board.getPiece(column, row);
-							                     selected.setLocation(new Location(column, row)); //setting the location of the piece as it is not set prior
-							                     selectedLabel.setText(selected.printLocation() + "\t-\t" + selected.getName().name()); //change the selected piece in the side panel
-						                     }
+											 if (board.getCurrentState().getPiece(column, row) != null && board.getCurrentState().getPiece(column, row).getColour() == getColour()) { //if its not an empty selection and the right colour is selected
+												 selected = board.getCurrentState().getPiece(column, row);
+												 selected.setLocation(new Location(column, row)); //setting the location of the piece as it is not set prior
+												 selectedLabel.setText(selected.printLocation() + "\t-\t" + selected.getName().name()); //change the selected piece in the side panel
+											 }
 					                     } else if (e.getButton() == MouseEvent.BUTTON3) { //right click
 						                     if (selected != null) {
 							                     move.move(selected, new Location(column, row));

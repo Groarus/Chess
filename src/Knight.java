@@ -4,9 +4,9 @@ import java.io.IOException;
 
 
 /**
- * Course: COSC 2P03
- * Name: Graham Burgsma
- * Date: 14-09-20
+ * Project: Chess
+ * Course: COSC 3P71 - Final Project
+ * Created: December, 2014
  */
 public class Knight extends Piece {
 	public Knight(Colour colour) {

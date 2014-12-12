@@ -4,23 +4,23 @@ import java.io.IOException;
 
 
 /**
- * Course: COSC 2P03
- * Name: Graham Burgsma
- * Date: 14-09-20
+ * Project: Chess
+ * Course: COSC 3P71 - Final Project
+ * Created: December, 2014
  */
 public class Bishop extends Piece {
 
 
-	public Bishop(Colour colour) {
-		super(Name.BISHOP, colour);
+    public Bishop(Colour colour) {
+        super(Name.BISHOP, colour);
 
-		try {
-			if (colour == Colour.BLACK)
-				image = ImageIO.read(new File("Images/BlackBishop.png"));
-			else if (colour == Colour.WHITE)
-				image = ImageIO.read(new File("Images/WhiteBishop.png"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+        try {
+            if (colour == Colour.BLACK)
+                image = ImageIO.read(new File("Images/BlackBishop.png"));
+            else if (colour == Colour.WHITE)
+                image = ImageIO.read(new File("Images/WhiteBishop.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

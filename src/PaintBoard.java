@@ -7,10 +7,9 @@ import java.io.IOException;
 
 
 /**
- * Course: COSC 3P71 - Assignment 2
- * Project Chess
- * Name: Graham Burgsma
- * Date: December 2014
+ * Project: Chess
+ * Course: COSC 3P71 - Final Project
+ * Created: December, 2014
  */
 public class PaintBoard extends JPanel {
 
@@ -41,9 +40,9 @@ public class PaintBoard extends JPanel {
 			for (int j = 0; j < 8; j++) {
 				try {
 					if (board.getHumanPlayer().getColour() == Colour.WHITE)
-						g.drawImage(board.getBoard()[i][j].getImage(), ((i * 100) + 25), (750 - ((j * 100) + 25)), null);
+						g.drawImage(board.getCurrentState().getPiece(i, j).getImage(), ((i * 100) + 25), (750 - ((j * 100) + 25)), null);
 					else
-						g.drawImage(board.getBoard()[i][j].getImage(), 750 - ((i * 100) + 25), ((j * 100) + 25), null);
+						g.drawImage(board.getCurrentState().getPiece(i, j).getImage(), 750 - ((i * 100) + 25), ((j * 100) + 25), null);
 				} catch (NullPointerException e) {
 					//Do nothing - occurs when getting image of blank space on board
 				}

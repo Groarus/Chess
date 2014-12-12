@@ -3,10 +3,9 @@ import java.awt.*;
 
 
 /**
- * Course: COSC 3P71 - Assignment 2
- * Project Chess
- * Name: Graham Burgsma
- * Date: December 2014
+ * Project: Chess
+ * Course: COSC 3P71 - Final Project
+ * Created: December, 2014
  */
 public class ComputerPlayer {
 

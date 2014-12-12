@@ -1,17 +1,16 @@
 /**
- * Course: COSC 2P03
- * Name: Graham Burgsma
- * Date: 14-09-20
+ * Project: Chess
+ * Course: COSC 3P71 - Final Project
+ * Created: December, 2014
  */
 
+
 public class Board {
-	private Piece[][] board = new Piece[8][8];
+	private State currentState = new State();
 	private HumanPlayer humanPlayer;
-	private GUI gui;
 
 	public Board(GUI gui) {
 		setUpBoard();
-		this.gui = gui;
 
 		//set up the GUI
 		PaintBoard paintBoard = new PaintBoard(this);
@@ -20,33 +19,34 @@ public class Board {
 
 	//to be converted to input text file later
 	public void setUpBoard() {
+
 		//white -- first row
-		board[0][0] = new Rook(Colour.WHITE);
-		board[1][0] = new Knight(Colour.WHITE);
-		board[2][0] = new Bishop(Colour.WHITE);
-		board[3][0] = new Queen(Colour.WHITE);
-		board[4][0] = new King(Colour.WHITE);
-		board[5][0] = new Bishop(Colour.WHITE);
-		board[6][0] = new Knight(Colour.WHITE);
-		board[7][0] = new Rook(Colour.WHITE);
+		currentState.setPiece(0, 0, new Rook(Colour.WHITE));
+		currentState.setPiece(1, 0, new Knight(Colour.WHITE));
+		currentState.setPiece(2, 0, new Bishop(Colour.WHITE));
+		currentState.setPiece(3, 0, new Queen(Colour.WHITE));
+		currentState.setPiece(4, 0, new King(Colour.WHITE));
+		currentState.setPiece(5, 0, new Bishop(Colour.WHITE));
+		currentState.setPiece(6, 0, new Knight(Colour.WHITE));
+		currentState.setPiece(7, 0, new Rook(Colour.WHITE));
 
 		//black -- first row
-		board[0][7] = new Rook(Colour.BLACK);
-		board[1][7] = new Knight(Colour.BLACK);
-		board[2][7] = new Bishop(Colour.BLACK);
-		board[3][7] = new Queen(Colour.BLACK);
-		board[4][7] = new King(Colour.BLACK);
-		board[5][7] = new Bishop(Colour.BLACK);
-		board[6][7] = new Knight(Colour.BLACK);
-		board[7][7] = new Rook(Colour.BLACK);
+		currentState.setPiece(0, 7, new Rook(Colour.BLACK));
+		currentState.setPiece(1, 7, new Knight(Colour.BLACK));
+		currentState.setPiece(2, 7, new Bishop(Colour.BLACK));
+		currentState.setPiece(3, 7, new Queen(Colour.BLACK));
+		currentState.setPiece(4, 7, new King(Colour.BLACK));
+		currentState.setPiece(5, 7, new Bishop(Colour.BLACK));
+		currentState.setPiece(6, 7, new Knight(Colour.BLACK));
+		currentState.setPiece(7, 7, new Rook(Colour.BLACK));
 
 		//white pawns
 		for (int i = 0; i < 8; i++) {
-			board[i][1] = new Pawn(Colour.WHITE);
+			currentState.setPiece(i, 1, new Pawn(Colour.WHITE));
 		}
 		//black pawns
 		for (int i = 0; i < 8; i++) {
-			board[i][6] = new Pawn(Colour.BLACK);
+			currentState.setPiece(i, 6, new Pawn(Colour.BLACK));
 		}
 	}
 
@@ -58,24 +58,21 @@ public class Board {
 		this.humanPlayer = humanPlayer;
 	}
 
-	public Piece[][] getBoard() {
-		return board;
-	}
 
 	//only to be used by MoveEngine
 	public void move(Location startLocation, Location endLocation) {
 		int startX = startLocation.getX(), startY = startLocation.getY(), endX = endLocation.getX(),  endY = endLocation.getY();
 
-		board[endX][endY] = board[startX][startY]; //moving the piece
-		board[startX][startY] = null; //old location to null
-		board[endX][endY].setLocation(new Location(endX, endY)); //setting the new location of the piece
-		board[endX][endY].setPrevLocation(new Location(startX, startY)); //setting the previous location
+		currentState.setPiece(endX, endY, currentState.getPiece(startX, startY));//moving the piece
+		currentState.setPiece(startX, startY, null); //old location to null
+		currentState.getPiece(endX, endY).setLocation(new Location(endX, endY)); //setting the new location of the piece
+		currentState.getPiece(endX, endY).setPrevLocation(new Location(startX, startY)); //setting the previous location
 
 		displayBoard(); //for testing
 	}
 
-	public Piece getPiece(int x, int y) {
-		return board[x][y];
+	public State getCurrentState() {
+		return currentState;
 	}
 
 
@@ -85,15 +82,15 @@ public class Board {
 			System.out.println("\n----------------------------------------------------------------------------------------------------------------------------");
 			System.out.print(" " + (m + 1) + " | ");
 			for (int n = 0; n < 8; n++) {
-				if (board[n][m] != null) {
-					String name = board[n][m].getName().toString();
+				if (currentState.getPiece(n, m) != null) {
+					String name = currentState.getPiece(n, m).getName().toString();
 					String message;
 					if (name.length() == 4)
-						message = " " + board[n][m].getName().toString() + ":" + board[n][m].getColour() + " ";
+						message = " " + currentState.getPiece(n, m).getName().toString() + ":" + currentState.getPiece(n, m).getColour() + " ";
 					else if (name.length() == 5)
-						message = " " + name + ":" + board[n][m].getColour();
+						message = " " + name + ":" + currentState.getPiece(n, m).getColour();
 					else
-						message = board[n][m].getName().toString() + ":" + board[n][m].getColour();
+						message = currentState.getPiece(n, m).getName().toString() + ":" + currentState.getPiece(n, m).getColour();
 
 					System.out.print(message + " | ");
 				} else
