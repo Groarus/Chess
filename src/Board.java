@@ -19,7 +19,6 @@ public class Board {
 
 	//to be converted to input text file later
 	public void setUpBoard() {
-
 		//white -- first row
 		currentState.setPiece(0, 0, new Rook(Colour.WHITE));
 		currentState.setPiece(1, 0, new Knight(Colour.WHITE));
