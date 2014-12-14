@@ -9,16 +9,16 @@ import java.io.IOException;
  * Created: December, 2014
  */
 public class King extends Piece {
-	public King(Colour colour) {
-		super(Name.KING, colour);
+    public King(Colour colour) {
+        super(Name.KING, colour);
 
-		try {
-			if (colour == Colour.BLACK)
-				image = ImageIO.read(new File("Images/BlackKing.png"));
-			else if (colour == Colour.WHITE)
-				image = ImageIO.read(new File("Images/WhiteKing.png"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+        try {
+            if (colour == Colour.BLACK)
+                image = ImageIO.read(new File("Images/BlackKing.png"));
+            else if (colour == Colour.WHITE)
+                image = ImageIO.read(new File("Images/WhiteKing.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

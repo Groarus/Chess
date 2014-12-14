@@ -5,61 +5,88 @@
  */
 public class MoveEngine {
 
-	private Board board;
+    private Board board;
 
-	public MoveEngine(Board board) {
-		this.board = board;
-	}
-
-
-	public boolean validateMove(Piece piece, Location toLocation) {
-		switch (piece.getName()) {
-			case PAWN:
-				return pawnCheck(piece, toLocation);
-			case KNIGHT:
-				return knightCheck(piece, toLocation);
-		}
-
-		return true;//temporarily, so other pieces can still be moved
-	}
+    public MoveEngine(Board board) {
+        this.board = board;
+    }
 
 
-	public void move(Piece piece, Location toLocation) {
-		if (validateMove(piece, toLocation)) {
-			board.move(piece.getLocation(), toLocation);
-		}
-	}
+    public boolean validateMove(Piece piece, Location toLocation) {
+        switch (piece.getName()) {
+            case PAWN:
+                return pawnCheck(piece, toLocation);
+            case KNIGHT:
+                return knightCheck(piece, toLocation);
+        }
 
-	private boolean pawnCheck(Piece piece, Location toLocation) {
-		int black = piece.getColour() == Colour.BLACK ? -1 : 1; //if black then the checks are negated, else are positive
-		Piece endPiece = board.getCurrentState().getPiece(toLocation.getX(), toLocation.getY());
+        return true;//temporarily, so other pieces can still be moved
+    }
+
+
+    public void move(Piece piece, Location toLocation) {
+        if (validateMove(piece, toLocation)) {
+            board.move(piece.getLocation(), toLocation);
+        }
+    }
+
+    private boolean pawnCheck(Piece piece, Location toLocation) {
+        int black = piece.getColour() == Colour.BLACK ? -1 : 1; //if black then the checks are negated, else are positive
+        Piece endPiece = board.getCurrentState().getPiece(toLocation.getX(), toLocation.getY());
 
 				/*For the first move
-				* Can either jump 1 or 2 spaces
+                * Can either jump 1 or 2 spaces
 				* Only if the previous location is null*/
-		if (endPiece == null) { //if the end space is empty
-			if (piece.getLocation().getX() == toLocation.getX() && (toLocation.getY() == piece.getLocation().getY() + (1 * black) || toLocation.getY() == piece.getLocation().getY() + (2 * black)) && piece.getPrevLocation() == null)
-				return true;
-				//for all moves after the first
-			else if (piece.getLocation().getX() == toLocation.getX() && toLocation.getY() == piece.getLocation().getY() + (1 * black))
-				return true;
-		} else { //if the end space is not empty
-			//If it is the opposite colour, and is either diagonally left or right
-			if (piece.getColour() != endPiece.getColour() && (piece.getLocation().getX() == toLocation.getX() - 1 || piece.getLocation().getX() == toLocation.getX() + 1) && toLocation.getY() == piece.getLocation().getY() + (1 * black))
-				return true;
-		}
-		return false;
-	}
+        if (endPiece == null) { //if the end space is empty
+            if (piece.getLocation().getX() == toLocation.getX() && (toLocation.getY() == piece.getLocation().getY() + (1 * black) || toLocation.getY() == piece.getLocation().getY() + (2 * black)) && piece.getPrevLocation() == null)
+                return true;
+                //for all moves after the first
+            else if (piece.getLocation().getX() == toLocation.getX() && toLocation.getY() == piece.getLocation().getY() + (1 * black))
+                return true;
+        } else { //if the end space is not empty
+            //If it is the opposite colour, and is either diagonally left or right
+            if (piece.getColour() != endPiece.getColour() && (piece.getLocation().getX() == toLocation.getX() - 1 || piece.getLocation().getX() == toLocation.getX() + 1) && toLocation.getY() == piece.getLocation().getY() + (1 * black))
+                return true;
+        }
+        return false;
+    }
 
-	private boolean knightCheck(Piece piece, Location toLocation) {
-		System.out.println("No. of active thread: " + Thread.activeCount());
+    private boolean knightCheck(Piece piece, Location toLocation) {
+        System.out.println("No. of active thread: " + Thread.activeCount());
 
-		Piece endPiece = board.getCurrentState().getPiece(toLocation.getX(), toLocation.getY());
+        Piece endPiece = board.getCurrentState().getPiece(toLocation.getX(), toLocation.getY());
 
-		/*Checks all the x positions first, then checks the y positions
-		* inside the if statement.
+        int toX = toLocation.getX();
+        int fromX = piece.getLocation().getX();
+        int toY = toLocation.getY();
+        int fromY = piece.getLocation().getY();
+        int xDif = Math.abs(fromX - toX);
+        int yDif = Math.abs(fromY - toY);
+        int maxSpaces = 3;
+
+        /*
+        Test different way for knight move:
+        If the xDifference is less than the max spaces
+        And the yDifference is less than the max spaces
+        And both are greater than 0
+        And the knight is being moved exactly 3 spaces
+        Return if there is no one there or if the piece enemy.
+         */
+
+        if (xDif <= maxSpaces & yDif <= maxSpaces & xDif > 0 & yDif > 0 & (yDif + xDif == maxSpaces)) {
+            return endPiece == null || endPiece.getColour() != piece.getColour();
+        } else {
+            return false;
+        }
+
+
+        //Old Code:
+        /*Checks all the x positions first, then checks the y positions
+         *inside the if statement.
 		 */
-		if (endPiece == null || endPiece.getColour() != piece.getColour()) {
+
+/*		if (endPiece == null || endPiece.getColour() != piece.getColour()) {
+
 			if (toLocation.getX() == piece.getLocation().getX() - 2) {
 				if (toLocation.getY() == piece.getLocation().getY() + 1) {
 					return true;
@@ -86,6 +113,8 @@ public class MoveEngine {
 				}
 			}
 		}
-		return false;
-	}
+            return false;
+
+        }*/
+    }
 }

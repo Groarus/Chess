@@ -10,16 +10,16 @@ import java.io.IOException;
  */
 
 public class Rook extends Piece {
-	public Rook(Colour colour) {
-		super(Name.ROOK, colour);
+    public Rook(Colour colour) {
+        super(Name.ROOK, colour);
 
-		try {
-			if (colour == Colour.BLACK)
-				image = ImageIO.read(new File("Images/BlackRook.png"));
-			else if (colour == Colour.WHITE)
-				image = ImageIO.read(new File("Images/WhiteRook.png"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+        try {
+            if (colour == Colour.BLACK)
+                image = ImageIO.read(new File("Images/BlackRook.png"));
+            else if (colour == Colour.WHITE)
+                image = ImageIO.read(new File("Images/WhiteRook.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
