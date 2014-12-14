@@ -56,12 +56,9 @@ public class MoveEngine {
 
         Piece endPiece = board.getCurrentState().getPiece(toLocation.getX(), toLocation.getY());
 
-        int toX = toLocation.getX();
-        int fromX = piece.getLocation().getX();
-        int toY = toLocation.getY();
-        int fromY = piece.getLocation().getY();
-        int xDif = Math.abs(fromX - toX);
-        int yDif = Math.abs(fromY - toY);
+        /*  Can we do this? Now its short AND clean - TEAMWORK  */
+        int xDif = Math.abs(piece.getLocation().getX() - toLocation.getX());
+        int yDif = Math.abs(piece.getLocation().getY() - toLocation.getY());
         int maxSpaces = 3;
 
         /*
@@ -78,43 +75,5 @@ public class MoveEngine {
         } else {
             return false;
         }
-
-
-        //Old Code:
-        /*Checks all the x positions first, then checks the y positions
-         *inside the if statement.
-		 */
-
-/*		if (endPiece == null || endPiece.getColour() != piece.getColour()) {
-
-			if (toLocation.getX() == piece.getLocation().getX() - 2) {
-				if (toLocation.getY() == piece.getLocation().getY() + 1) {
-					return true;
-				} else if (toLocation.getY() == piece.getLocation().getY() - 1) {
-					return true;
-				}
-			} else if (toLocation.getX() == piece.getLocation().getX() - 1) {
-				if (toLocation.getY() == piece.getLocation().getY() + 2) {
-					return true;
-				} else if (toLocation.getY() == piece.getLocation().getY() - 2) {
-					return true;
-				}
-			} else if (toLocation.getX() == piece.getLocation().getX() + 1) {
-				if (toLocation.getY() == piece.getLocation().getY() + 2) {
-					return true;
-				} else if (toLocation.getY() == piece.getLocation().getY() - 2) {
-					return true;
-				}
-			} else if (toLocation.getX() == piece.getLocation().getX() + 2) {
-				if (toLocation.getY() == piece.getLocation().getY() + 1) {
-					return true;
-				} else if (toLocation.getY() == piece.getLocation().getY() - 1) {
-					return true;
-				}
-			}
-		}
-            return false;
-
-        }*/
     }
 }

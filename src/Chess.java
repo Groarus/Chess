@@ -10,7 +10,6 @@ public class Chess {
 
     public Chess() {
         GUI gui = new GUI();
-        //This is eric being awesome as always (H)
         Board board = new Board(gui);
         board.displayBoard();
 
