@@ -8,6 +8,7 @@
 public class Board {
     private State currentState = new State();
     private HumanPlayer humanPlayer;
+    private ComputerPlayer computerPlayer;
 
     public Board(GUI gui) {
         setUpBoard();
@@ -56,7 +57,9 @@ public class Board {
     public void setHumanPlayer(HumanPlayer humanPlayer) {
         this.humanPlayer = humanPlayer;
     }
+    public void setComputerPlayer(ComputerPlayer computerPlayer){this.computerPlayer = computerPlayer;}
 
+    public ComputerPlayer getComputerPlayer() {return computerPlayer;}
 
     //only to be used by MoveEngine
     public void move(Location startLocation, Location endLocation) {

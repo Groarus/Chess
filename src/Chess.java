@@ -26,6 +26,7 @@ public class Chess {
             humanPlayer = new HumanPlayer(Colour.BLACK, board, gui);
         }
         board.setHumanPlayer(humanPlayer);
+        board.setComputerPlayer(computerPlayer);
 
         gui.startGUI(); //makes the gui visible
     }

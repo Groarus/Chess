@@ -19,14 +19,13 @@ public class HumanPlayer extends Player {
     private JLabel numMovesLabel = new JLabel("0");
     private JLabel turnLabel = new JLabel("Your Turn");
     private JButton quitButton = new JButton("Quit");
-
+    private Board board;
     private MoveEngine move;
-
 
     public HumanPlayer(Colour colour, Board board, GUI gui) {
         super(colour, board, gui);
         this.move = new MoveEngine(board);
-
+        this.board = board;
         //set up the gui
         infoPanel();
         gui.addSidePanel(panel);
@@ -85,7 +84,7 @@ public class HumanPlayer extends Player {
 
         gui.addMouseListener(new MouseListener() {
                                  @Override
-                                 public void mouseClicked(MouseEvent e) {
+                                 public void mousePressed(MouseEvent e) { //Mouse pressed over mouse clicked works much much better
                                      int x = e.getX();
                                      int y = e.getY() - 25;
                                      int row = -1, column = -1;
@@ -115,7 +114,13 @@ public class HumanPlayer extends Player {
                                              }
                                          } else if (e.getButton() == MouseEvent.BUTTON3) { //right click
                                              if (selected != null) {
+                                                 //execute move, check for Check. If in Check move piece back.
                                                  move.move(selected, new Location(column, row));
+                                                 if (isInCheck()) {
+                                                     move.move(selected, selected.getPrevLocation());
+                                                     //Display message
+                                                 }
+                                                 //Put another if statement here to check if it puts computer in Check.
                                                  gui.repaint(); //refreshes the board
                                                  selected = null; //unselect it
                                                  selectedLabel.setText("None");
@@ -125,7 +130,7 @@ public class HumanPlayer extends Player {
                                  }
 
                                  @Override
-                                 public void mousePressed(MouseEvent e) {
+                                 public void mouseClicked(MouseEvent e) {
 
                                  }
 
@@ -147,5 +152,33 @@ public class HumanPlayer extends Player {
                              }
 
         );
+    }
+
+    private boolean isInCheck() {
+        boolean result = false;
+        Location kingLocation = getKingLocation();
+        System.out.println(kingLocation.getX() + " " + kingLocation.getY());
+        for (int i = 0; i < board.getCurrentState().getState().length; i++) {
+            for (int j = 0; j < board.getCurrentState().getState().length; j++) {
+                if (!(board.getCurrentState().getPiece(i, j) == null) && board.getCurrentState().getPiece(i, j).getColour() == board.getComputerPlayer().getColour() && move.validateMove(board.getCurrentState().getPiece(i, j), kingLocation)) {
+                    result = true;
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
+    private Location getKingLocation() {
+
+        for (int i = 0; i < board.getCurrentState().getState().length; i++) {
+            for (int j = 0; j < board.getCurrentState().getState().length; j++) {
+                if (!(board.getCurrentState().getPiece(i, j) == null) && board.getCurrentState().getPiece(i, j).getColour() == this.getColour() && board.getCurrentState().getPiece(i, j).getName() == Piece.Name.KING) {
+                    return board.getCurrentState().getPiece(i, j).getLocation();
+                }
+
+            }
+        }
+        return null; //No King...Should never happen
     }
 }

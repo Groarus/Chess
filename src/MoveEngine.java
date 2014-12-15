@@ -58,7 +58,7 @@ public class MoveEngine {
         if (yDif <= maxSpaces & ((piece.getColour() == Colour.BLACK & piece.getLocation().getY() > toLocation.getY()) | (piece.getColour() == Colour.WHITE & piece.getLocation().getY() < toLocation.getY()))) {
             if (piece.getLocation().getX() == toLocation.getX() & endPiece == null) {
                 return true;
-            } else return endPiece != null && endPiece.getColour() != piece.getColour() && xDif > 0; //Pawn Capture
+            } else return endPiece != null && endPiece.getColour() != piece.getColour() && xDif == 1 && yDif == 1; //Pawn Capture
         } else {
             return false;
         }
@@ -177,11 +177,13 @@ public class MoveEngine {
         int yDif = Math.abs(piece.getLocation().getY() - toLocation.getY());
         int maxSpaces = 1;
 
-        if ((xDif >= 0 & yDif >= 0) && ((yDif == maxSpaces) | (xDif == maxSpaces))) {
+        if ((xDif >= 0 & yDif >= 0) && ((yDif <= maxSpaces) && (xDif <= maxSpaces))) {
             return endPiece == null || endPiece.getColour() != piece.getColour();
         } else {
             return false;
         }
         //Going to need to add Check clause since kings cant move into Check
     }
+
+    public Board getBoard(){return this.board;}
 }

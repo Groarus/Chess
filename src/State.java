@@ -27,6 +27,9 @@ public class State {
 
     public void setPiece(int m, int n, Piece piece) {
         state[m][n] = piece;
+        if (!(piece == null)) {
+            state[m][n].setLocation(new Location(m, n));
+        }
     }
 
     public Piece getPiece(int m, int n) {
