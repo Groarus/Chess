@@ -20,6 +20,12 @@ public class MoveEngine {
                 return knightCheck(piece, toLocation);
             case BISHOP:
                 return bishopCheck(piece, toLocation);
+            case ROOK:
+                return rookCheck(piece, toLocation);
+            case QUEEN:
+                return rookCheck(piece, toLocation) || bishopCheck(piece, toLocation);
+            case KING:
+                return kingCheck(piece, toLocation);
         }
 
         return true;//temporarily, so other pieces can still be moved
@@ -33,26 +39,6 @@ public class MoveEngine {
     }
 
     private boolean pawnCheck(Piece piece, Location toLocation) {
-        //int black = piece.getColour() == Colour.BLACK ? -1 : 1; //if black then the checks are negated, else are positive
-    /*			*//*For the first move
-                * Can either jump 1 or 2 spaces
-				* Only if the previous location is null*//*
-        if (endPiece == null) { //if the end space is empty
-            if (piece.getLocation().getX() == toLocation.getX() && (toLocation.getY() == piece.getLocation().getY() + (1 * black) || toLocation.getY() == piece.getLocation().getY() + (2 * black)) && piece.getPrevLocation() == null)
-                return true;
-                //for all moves after the first
-            else if (piece.getLocation().getX() == toLocation.getX() && toLocation.getY() == piece.getLocation().getY() + (1 * black))
-                return true;
-        } else { //if the end space is not empty
-            //If it is the opposite colour, and is either diagonally left or right
-            if (piece.getColour() != endPiece.getColour() && (piece.getLocation().getX() == toLocation.getX() - 1 || piece.getLocation().getX() == toLocation.getX() + 1) && toLocation.getY() == piece.getLocation().getY() + (1 * black))
-                return true;
-        }
-        return false;*/
-
-        /*
-         Redid pawn movement, let me know what you think!
-         */
 
         Piece endPiece = board.getCurrentState().getPiece(toLocation.getX(), toLocation.getY());
         int xDif = Math.abs(piece.getLocation().getX() - toLocation.getX());
@@ -82,8 +68,6 @@ public class MoveEngine {
         System.out.println("No. of active thread: " + Thread.activeCount());
 
         Piece endPiece = board.getCurrentState().getPiece(toLocation.getX(), toLocation.getY());
-
-        /*  Can we do this? Now its short AND clean - TEAMWORK  */ //*Fist pump*
         int xDif = Math.abs(piece.getLocation().getX() - toLocation.getX());
         int yDif = Math.abs(piece.getLocation().getY() - toLocation.getY());
         int maxSpaces = 3;
@@ -144,5 +128,60 @@ public class MoveEngine {
         } else {
             return false;
         }
+    }
+
+    private boolean rookCheck(Piece piece, Location toLocation) {
+        Piece endPiece = board.getCurrentState().getPiece(toLocation.getX(), toLocation.getY());
+        int xDif = Math.abs(piece.getLocation().getX() - toLocation.getX());
+        int yDif = Math.abs(piece.getLocation().getY() - toLocation.getY());
+        int maxSpaces = 1;
+
+        //Four ifs to check if there is nothing in between where it needs to go
+        if (piece.getLocation().getY() < toLocation.getY()) { //Moving up
+            for (int i = 1; i < yDif; i++) {
+                if (board.getCurrentState().getPiece(piece.getLocation().getX(), piece.getLocation().getY() + i) == null) {
+                    maxSpaces++; //No piece in the way
+                }
+            }
+        } else if (piece.getLocation().getY() > toLocation.getY()) {//Moving down
+            for (int i = 1; i < yDif; i++) {
+                if (board.getCurrentState().getPiece(piece.getLocation().getX(), piece.getLocation().getY() - i) == null) {
+                    maxSpaces++;//No piece in the way
+                }
+            }
+        } else if (piece.getLocation().getX() > toLocation.getX()) {//Moving left
+            for (int i = 1; i < xDif; i++) {
+                if (board.getCurrentState().getPiece(piece.getLocation().getX() - i, piece.getLocation().getY()) == null) {
+                    maxSpaces++;//No piece in the way
+                }
+            }
+        } else if (piece.getLocation().getX() < toLocation.getX()) {//Moving right
+            for (int i = 1; i < xDif; i++) {
+                if (board.getCurrentState().getPiece(piece.getLocation().getX() + i, piece.getLocation().getY()) == null) {
+                    maxSpaces++;//No piece in the way
+                }
+            }
+        }
+
+        if (((xDif == 0 & yDif > 0) || (yDif == 0 & xDif > 0)) && ((yDif == maxSpaces) || (xDif == maxSpaces))) {
+            return endPiece == null || endPiece.getColour() != piece.getColour();
+        } else {
+            return false;
+        }
+
+    }
+
+    private boolean kingCheck(Piece piece, Location toLocation) {
+        Piece endPiece = board.getCurrentState().getPiece(toLocation.getX(), toLocation.getY());
+        int xDif = Math.abs(piece.getLocation().getX() - toLocation.getX());
+        int yDif = Math.abs(piece.getLocation().getY() - toLocation.getY());
+        int maxSpaces = 1;
+
+        if ((xDif >= 0 & yDif >= 0) && ((yDif == maxSpaces) | (xDif == maxSpaces))) {
+            return endPiece == null || endPiece.getColour() != piece.getColour();
+        } else {
+            return false;
+        }
+        //Going to need to add Check clause since kings cant move into Check
     }
 }
