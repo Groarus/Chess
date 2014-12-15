@@ -157,7 +157,6 @@ public class HumanPlayer extends Player {
     private boolean isInCheck() {
         boolean result = false;
         Location kingLocation = getKingLocation();
-        System.out.println(kingLocation.getX() + " " + kingLocation.getY());
         for (int i = 0; i < board.getCurrentState().getState().length; i++) {
             for (int j = 0; j < board.getCurrentState().getState().length; j++) {
                 if (!(board.getCurrentState().getPiece(i, j) == null) && board.getCurrentState().getPiece(i, j).getColour() == board.getComputerPlayer().getColour() && move.validateMove(board.getCurrentState().getPiece(i, j), kingLocation)) {
