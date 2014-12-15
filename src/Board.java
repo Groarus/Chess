@@ -67,7 +67,7 @@ public class Board {
         currentState.getPiece(endX, endY).setLocation(new Location(endX, endY)); //setting the new location of the piece
         currentState.getPiece(endX, endY).setPrevLocation(new Location(startX, startY)); //setting the previous location
 
-        displayBoard(); //for testing
+//        displayBoard(); //for testing
     }
 
     public State getCurrentState() {

@@ -7,15 +7,11 @@ import java.awt.*;
  * Course: COSC 3P71 - Final Project
  * Created: December, 2014
  */
-public class ComputerPlayer {
+public class ComputerPlayer extends Player {
 
-    private Colour colour;
-    private JPanel panel;
-    private Board board;
 
     public ComputerPlayer(Colour colour, Board board, GUI gui) {
-        this.colour = colour;
-        this.board = board;
+        super(colour, board, gui);
 
         //set up the GUI
         infoPanel();

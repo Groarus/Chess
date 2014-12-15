@@ -11,11 +11,8 @@ import java.awt.event.MouseListener;
  * Course: COSC 3P71 - Final Project
  * Created: December, 2014
  */
-public class HumanPlayer {
+public class HumanPlayer extends Player {
 
-    private Colour colour;
-    private Board board;
-    private GUI gui;
     private Piece selected = null;
     private JPanel panel;
     private JLabel selectedLabel = new JLabel("None");
@@ -27,19 +24,13 @@ public class HumanPlayer {
 
 
     public HumanPlayer(Colour colour, Board board, GUI gui) {
-        this.colour = colour;
-        this.board = board;
-        this.gui = gui;
+        super(colour, board, gui);
         this.move = new MoveEngine(board);
 
         //set up the gui
         infoPanel();
         gui.addSidePanel(panel);
         guiListener();
-    }
-
-    public Colour getColour() {
-        return colour;
     }
 
 
