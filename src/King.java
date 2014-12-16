@@ -9,6 +9,7 @@ import java.io.IOException;
  * Created: December, 2014
  */
 public class King extends Piece {
+
     public King(Colour colour) {
         super(Name.KING, colour);
 

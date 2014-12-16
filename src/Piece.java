@@ -15,7 +15,7 @@ public abstract class Piece {
     private Name name;
     private Status status;
     private double value;
-    private boolean selected, possibleMove;
+    private boolean selected, possibleMove, inCheck;
 
     public Piece(Name name, Colour colour) {
         this.colour = colour;
@@ -77,12 +77,12 @@ public abstract class Piece {
         this.selected = selected;
     }
 
-    enum Status {
-        ALIVE, DEAD;
+    public boolean isInCheck() {
+        return inCheck;
     }
 
-    enum Name {
-        BISHOP, KING, KNIGHT, PAWN, QUEEN, ROOK, EMPTY;
+    public void setInCheck(boolean inCheck) {
+        this.inCheck = inCheck;
     }
 
     public Piece clone() {
@@ -152,6 +152,14 @@ public abstract class Piece {
             }
             return e;
         }
+    }
+
+    enum Status {
+        ALIVE, DEAD;
+    }
+
+    enum Name {
+        BISHOP, KING, KNIGHT, PAWN, QUEEN, ROOK, EMPTY;
     }
 
 }

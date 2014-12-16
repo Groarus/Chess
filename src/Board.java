@@ -116,9 +116,7 @@ public class Board {
 
     public Board clone(){
         Piece[][] temp = new Piece[this.currentState.getState().length][this.currentState.getState()[0].length];
-//        for (int i = 0; i < this.currentState.getState().length; i++) {
-//            System.arraycopy(this.currentState.getState()[i], 0, temp[i], 0, this.currentState.getState()[0].length);
-//        }
+
         for (int i = 0; i < this.currentState.getState().length; i++) {
             for (int j = 0; j <this.currentState.getState()[0].length; j++) {
                 temp[i][j] = this.currentState.getState()[i][j].clone();

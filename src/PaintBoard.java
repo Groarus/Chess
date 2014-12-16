@@ -23,7 +23,7 @@ public class PaintBoard extends JPanel {
     @Override
     public void paintComponent(Graphics g) throws NullPointerException {
         //BACKGROUND//
-        BufferedImage background = null, selected = null, possibleMove = null;
+        BufferedImage background = null, selected = null, possibleMove = null, inCheck = null;
         try {
             if (board.getHumanPlayer().getColour() == Colour.WHITE)
                 background = ImageIO.read(new File("Images/WhiteChessBoard.png"));
@@ -32,6 +32,8 @@ public class PaintBoard extends JPanel {
 
             selected = ImageIO.read(new File("Images/Selected.png"));
             possibleMove = ImageIO.read(new File("Images/PossibleMove.png"));
+            inCheck = ImageIO.read(new File("Images/InCheck.png"));
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -41,17 +43,21 @@ public class PaintBoard extends JPanel {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 try {
+                    int x, y;
                     if (board.getHumanPlayer().getColour() == Colour.WHITE) {
-                        if (board.getCurrentState().getPiece(i, j).isSelected())
-                            g.drawImage(selected, ((i * 100) + 25), (750 - ((j * 100) + 25)), null);
-                        if (board.getCurrentState().getPiece(i, j).isPossibleMove())
-                            g.drawImage(possibleMove, ((i * 100) + 25), (750 - ((j * 100) + 25)), null);
-                        g.drawImage(board.getCurrentState().getPiece(i, j).getImage(), ((i * 100) + 25), (750 - ((j * 100) + 25)), null);
+                        x = ((i * 100) + 25);
+                        y = (750 - ((j * 100) + 25));
                     } else {
-                        if (board.getCurrentState().getPiece(i, j).isSelected())
-                            g.drawImage(selected, 750 - ((i * 100) + 25), ((j * 100) + 25), null);
-                        g.drawImage(board.getCurrentState().getPiece(i, j).getImage(), 750 - ((i * 100) + 25), ((j * 100) + 25), null);
+                        x = 750 - ((i * 100) + 25);
+                        y = ((j * 100) + 25);
                     }
+                    if (board.getCurrentState().getPiece(i, j).isSelected())
+                        g.drawImage(selected, x, y, null);
+                    if (board.getCurrentState().getPiece(i, j).isPossibleMove())
+                        g.drawImage(possibleMove, x, y, null);
+                    if (board.getCurrentState().getPiece(i, j).isInCheck())
+                        g.drawImage(inCheck, x, y, null);
+                    g.drawImage(board.getCurrentState().getPiece(i, j).getImage(), x, y, null);
                 } catch (NullPointerException e) {
                     //Do nothing - occurs when getting image of blank space on board
                 }

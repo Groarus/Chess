@@ -201,6 +201,11 @@ public class MoveEngine {
                 }
             }
         }
+        //If King is in check - PROBABLY MOVE THIS TO CPU CLASS AFTER MOVE - Graham//
+        Piece tempKing = board.getCurrentState().getPiece(getKingLocation(piece, this.board));
+        if (isInCheck(tempKing, this.board))
+            tempKing.setInCheck(true);
+
         return possible;
     }
 
