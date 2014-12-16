@@ -9,13 +9,15 @@ public class Board {
     private State currentState = new State();
     private HumanPlayer humanPlayer;
     private ComputerPlayer computerPlayer;
-
+    private GUI gui;
     public Board(GUI gui) {
+        if (!(gui == null)) {
         setUpBoard();
-
         //set up the GUI
-        PaintBoard paintBoard = new PaintBoard(this);
-        gui.addBoardPanel(paintBoard);
+            PaintBoard paintBoard = new PaintBoard(this);
+            gui.addBoardPanel(paintBoard);
+            this.gui = gui;
+        }
     }
 
     //to be converted to input text file later
@@ -112,4 +114,20 @@ public class Board {
         System.out.println("\n--------- A ------------- B ------------ C ------------ D ------------ E ------------ F ------------ G ------------ H ------");
     }
 
+    public Board clone(){
+        Piece[][] temp = new Piece[this.currentState.getState().length][this.currentState.getState()[0].length];
+//        for (int i = 0; i < this.currentState.getState().length; i++) {
+//            System.arraycopy(this.currentState.getState()[i], 0, temp[i], 0, this.currentState.getState()[0].length);
+//        }
+        for (int i = 0; i < this.currentState.getState().length; i++) {
+            for (int j = 0; j <this.currentState.getState()[0].length; j++) {
+                temp[i][j] = this.currentState.getState()[i][j].clone();
+            }
+        }
+        Board tempBoard = new Board(null);
+        tempBoard.getCurrentState().setState(temp);
+        tempBoard.setComputerPlayer(this.getComputerPlayer());
+        tempBoard.setHumanPlayer(this.getHumanPlayer());
+        return tempBoard;
+    }
 }

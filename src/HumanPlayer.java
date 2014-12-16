@@ -118,20 +118,7 @@ public class HumanPlayer extends Player {
                                              }
                                          } else if (e.getButton() == MouseEvent.BUTTON3) { //right click
                                              if (selected.getName() != Piece.Name.EMPTY) {
-                                                 //Save piece array in temp var
-                                                 //execute move, check for Check. If in Check move piece back.
-                                                 //Reload the piece array
-
-                                                 Piece[][] temp = new Piece[board.getCurrentState().getState().length][board.getCurrentState().getState()[0].length];
-                                                 for (int i = 0; i < board.getCurrentState().getState().length; i++) {
-                                                     System.arraycopy(board.getCurrentState().getState()[i], 0, temp[i], 0, board.getCurrentState().getState()[0].length);
-                                                 }
                                                  move.move(selected, new Location(column, row));
-                                                 if (isInCheck()) {
-                                                     board.move(selected.getLocation(), selected.getPrevLocation()); //Skips validation because pawns cant move backwards
-                                                     board.getCurrentState().setState(temp);
-                                                     //Display message
-                                                 }
                                                  resetHighlight();
                                                  gui.repaint(); //refreshes the board
                                                  selected = new Empty(Piece.Name.EMPTY, Colour.NEUTRAL); //unselect it
@@ -181,29 +168,4 @@ public class HumanPlayer extends Player {
         }
     }
 
-    private boolean isInCheck() {
-        boolean result = false;
-        Location kingLocation = getKingLocation();
-        for (int i = 0; i < board.getCurrentState().getState().length; i++) {
-            for (int j = 0; j < board.getCurrentState().getState().length; j++) {
-                if (!(board.getCurrentState().getPiece(i, j).getName() == Piece.Name.EMPTY) && board.getCurrentState().getPiece(i, j).getColour() == board.getComputerPlayer().getColour() && move.validateMove(board.getCurrentState().getPiece(i, j), kingLocation)) {
-                    result = true;
-                    break;
-                }
-            }
-        }
-        return result;
-    }
-
-    private Location getKingLocation() {
-
-        for (int i = 0; i < board.getCurrentState().getState().length; i++) {
-            for (int j = 0; j < board.getCurrentState().getState().length; j++) {
-                if (!(board.getCurrentState().getPiece(i, j).getName() == Piece.Name.EMPTY) && board.getCurrentState().getPiece(i, j).getColour() == this.getColour() && board.getCurrentState().getPiece(i, j).getName() == Piece.Name.KING) {
-                    return board.getCurrentState().getPiece(i, j).getLocation();
-                }
-            }
-        }
-        return null; //No King...Should never happen
-    }
 }

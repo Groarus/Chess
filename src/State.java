@@ -27,7 +27,7 @@ public class State {
 
     public void setPiece(int x, int y, Piece piece) {
         state[x][y] = piece;
-        if (!(piece == null)) {
+        if (!(piece.getName() == Piece.Name.EMPTY)) {
             state[x][y].setLocation(new Location(x, y));
         }
     }

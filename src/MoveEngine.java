@@ -14,20 +14,20 @@ public class MoveEngine {
     }
 
 
-    public boolean validateMove(Piece piece, Location toLocation) {
+    public boolean validateMove(Piece piece, Location toLocation, Board board) {
         switch (piece.getName()) {
             case PAWN:
-                return pawnCheck(piece, toLocation);
+                return pawnCheck(piece, toLocation,board);
             case KNIGHT:
-                return knightCheck(piece, toLocation);
+                return knightCheck(piece, toLocation,board);
             case BISHOP:
-                return bishopCheck(piece, toLocation);
+                return bishopCheck(piece, toLocation,board);
             case ROOK:
-                return rookCheck(piece, toLocation);
+                return rookCheck(piece, toLocation,board);
             case QUEEN:
-                return rookCheck(piece, toLocation) || bishopCheck(piece, toLocation);
+                return rookCheck(piece, toLocation,board) || bishopCheck(piece, toLocation,board);
             case KING:
-                return kingCheck(piece, toLocation);
+                return kingCheck(piece, toLocation,board);
         }
 
         return true;//temporarily, so other pieces can still be moved
@@ -35,13 +35,12 @@ public class MoveEngine {
 
 
     public void move(Piece piece, Location toLocation) {
-        if (validateMove(piece, toLocation)) {
+        if (validateMove(piece, toLocation,this.board) && canMove(piece, toLocation)) {
             board.move(piece.getLocation(), toLocation);
         }
     }
 
-    private boolean pawnCheck(Piece piece, Location toLocation) {
-
+    private boolean pawnCheck(Piece piece, Location toLocation,Board board) {
         Piece endPiece = board.getCurrentState().getPiece(toLocation.getX(), toLocation.getY());
         int xDif = Math.abs(piece.getLocation().getX() - toLocation.getX());
         int yDif = Math.abs(piece.getLocation().getY() - toLocation.getY());
@@ -61,13 +60,13 @@ public class MoveEngine {
             if (piece.getLocation().getX() == toLocation.getX() & endPiece.getName() == Piece.Name.EMPTY) {
                 return true;
             } else
-                return endPiece.getName() != Piece.Name.EMPTY && endPiece.getColour() != piece.getColour() && xDif == 1 && yDif == 1; //Pawn Capture
+                return endPiece.getName() != Piece.Name.EMPTY && endPiece.getColour() != piece.getColour() && xDif == 1 && yDif == 1 ; //Pawn Capture
         } else {
             return false;
         }
     }
 
-    private boolean knightCheck(Piece piece, Location toLocation) {
+    private boolean knightCheck(Piece piece, Location toLocation, Board board) {
         Piece endPiece = board.getCurrentState().getPiece(toLocation.getX(), toLocation.getY());
         int xDif = Math.abs(piece.getLocation().getX() - toLocation.getX());
         int yDif = Math.abs(piece.getLocation().getY() - toLocation.getY());
@@ -83,13 +82,13 @@ public class MoveEngine {
          */
 
         if (xDif <= maxSpaces & yDif <= maxSpaces & xDif > 0 & yDif > 0 & (yDif + xDif == maxSpaces)) {
-            return endPiece.getColour() != piece.getColour();
+            return endPiece.getColour() != piece.getColour() ;
         } else {
             return false;
         }
     }
 
-    private boolean bishopCheck(Piece piece, Location toLocation) {
+    private boolean bishopCheck(Piece piece, Location toLocation,Board board) {
         Piece endPiece = board.getCurrentState().getPiece(toLocation.getX(), toLocation.getY());
         int xDif = Math.abs(piece.getLocation().getX() - toLocation.getX());
         int yDif = Math.abs(piece.getLocation().getY() - toLocation.getY());
@@ -129,13 +128,13 @@ public class MoveEngine {
         }
 
         if (xDif == yDif && xDif == maxSpaces) {//Moving diagonally with no one in between
-            return endPiece.getColour() != piece.getColour(); //Empty or enemy
+            return endPiece.getColour() != piece.getColour() ; //Empty or enemy
         } else {
             return false;
         }
     }
 
-    private boolean rookCheck(Piece piece, Location toLocation) {
+    private boolean rookCheck(Piece piece, Location toLocation, Board board) {
         Piece endPiece = board.getCurrentState().getPiece(toLocation.getX(), toLocation.getY());
         int xDif = Math.abs(piece.getLocation().getX() - toLocation.getX());
         int yDif = Math.abs(piece.getLocation().getY() - toLocation.getY());
@@ -169,14 +168,14 @@ public class MoveEngine {
         }
 
         if (((xDif == 0 & yDif > 0) || (yDif == 0 & xDif > 0)) && ((yDif == maxSpaces) || (xDif == maxSpaces))) {
-            return endPiece.getColour() != piece.getColour();
+            return endPiece.getColour() != piece.getColour() ;
         } else {
             return false;
         }
 
     }
 
-    private boolean kingCheck(Piece piece, Location toLocation) {
+    private boolean kingCheck(Piece piece, Location toLocation,Board board) {
         Piece endPiece = board.getCurrentState().getPiece(toLocation.getX(), toLocation.getY());
         int xDif = Math.abs(piece.getLocation().getX() - toLocation.getX());
         int yDif = Math.abs(piece.getLocation().getY() - toLocation.getY());
@@ -197,11 +196,50 @@ public class MoveEngine {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 Location temp = new Location(i, j);
-                if (validateMove(piece, temp)) {
+                if ((board.getCurrentState().getPiece(temp).getName() == Piece.Name.EMPTY || board.getCurrentState().getPiece(temp).getColour() != piece.getColour()) && validateMove(piece, temp, this.board) && canMove(piece, temp)) {
                     possible.push(temp);
                 }
             }
         }
         return possible;
+    }
+
+    private boolean isInCheck(Piece piece, Board board) {
+        boolean result = false;
+        Location kingLocation = getKingLocation(piece, board);
+        for (int i = 0; i < board.getCurrentState().getState().length; i++) {
+            for (int j = 0; j < board.getCurrentState().getState().length; j++) {
+                if (!(board.getCurrentState().getPiece(i, j).getName() == Piece.Name.EMPTY) && board.getCurrentState().getPiece(i, j).getColour() == board.getComputerPlayer().getColour() && validateMove(board.getCurrentState().getPiece(i, j), kingLocation,board)) {
+                    result = true;
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
+
+
+    private Location getKingLocation(Piece piece, Board board) {
+
+        for (int i = 0; i < board.getCurrentState().getState().length; i++) {
+            for (int j = 0; j < board.getCurrentState().getState().length; j++) {
+                if (!(board.getCurrentState().getPiece(i, j).getName() == Piece.Name.EMPTY) && board.getCurrentState().getPiece(i, j).getColour() == piece.getColour() && board.getCurrentState().getPiece(i, j).getName() == Piece.Name.KING) {
+                    return board.getCurrentState().getPiece(i, j).getLocation();
+                }
+            }
+        }
+        return null; //No King...Should never happen
+    }
+
+    private boolean canMove(Piece piece, Location toLocation) {
+        Board tempBoard = board.clone();
+        Piece tempPiece = piece.clone();
+        Location tempLocation, tempToLocation;
+        tempLocation = new Location(tempPiece.getLocation().getX(),tempPiece.getLocation().getY());
+        tempToLocation = new Location(toLocation.getX(),toLocation.getY());
+        tempBoard.move(tempLocation, tempToLocation);
+        tempPiece = tempBoard.getCurrentState().getPiece(tempToLocation);
+        return !isInCheck(tempPiece, tempBoard);
     }
 }
