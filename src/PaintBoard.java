@@ -25,7 +25,7 @@ public class PaintBoard extends JPanel {
         //BACKGROUND//
         BufferedImage background = null, selected = null, possibleMove = null, inCheck = null;
         try {
-            if (board.getHumanPlayer().getColour() == Colour.WHITE)
+            if (board.getWhitePlayer().getClass() == HumanPlayer.class)
                 background = ImageIO.read(new File("Images/WhiteChessBoard.png"));
             else
                 background = ImageIO.read(new File("Images/BlackChessBoard.png"));
@@ -44,7 +44,7 @@ public class PaintBoard extends JPanel {
             for (int j = 0; j < 8; j++) {
                 try {
                     int x, y;
-                    if (board.getHumanPlayer().getColour() == Colour.WHITE) {
+                    if (board.getWhitePlayer().getClass() == HumanPlayer.class) {
                         x = ((i * 100) + 25);
                         y = (750 - ((j * 100) + 25));
                     } else {

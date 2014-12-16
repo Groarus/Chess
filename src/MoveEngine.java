@@ -37,6 +37,7 @@ public class MoveEngine {
     public void move(Piece piece, Location toLocation) {
         if (validateMove(piece, toLocation,this.board) && canMove(piece, toLocation)) {
             board.move(piece.getLocation(), toLocation);
+            highlightCheck();
         }
     }
 
@@ -201,20 +202,27 @@ public class MoveEngine {
                 }
             }
         }
-        //If King is in check - PROBABLY MOVE THIS TO CPU CLASS AFTER MOVE - Graham//
-        Piece tempKing = board.getCurrentState().getPiece(getKingLocation(piece, this.board));
+        return possible;
+    }
+
+    public void highlightCheck() {
+        //Checks if either king is in check and highlights its location if true//
+        Piece tempKing = board.getCurrentState().getPiece(getKingLocation(Colour.BLACK, this.board));
         if (isInCheck(tempKing, this.board))
             tempKing.setInCheck(true);
-
-        return possible;
+        tempKing = board.getCurrentState().getPiece(getKingLocation(Colour.WHITE, this.board));
+        if (isInCheck(tempKing, this.board))
+            tempKing.setInCheck(true);
     }
 
     private boolean isInCheck(Piece piece, Board board) {
         boolean result = false;
-        Location kingLocation = getKingLocation(piece, board);
+        Location kingLocation = getKingLocation(piece.getColour(), board);
         for (int i = 0; i < board.getCurrentState().getState().length; i++) {
             for (int j = 0; j < board.getCurrentState().getState().length; j++) {
-                if (!(board.getCurrentState().getPiece(i, j).getName() == Piece.Name.EMPTY) && board.getCurrentState().getPiece(i, j).getColour() == board.getComputerPlayer().getColour() && validateMove(board.getCurrentState().getPiece(i, j), kingLocation,board)) {
+                //Graham changed this because getComputerPlayer doens't exist anymore, could be wrong
+//                if (!(board.getCurrentState().getPiece(i, j).getName() == Piece.Name.EMPTY) && board.getCurrentState().getPiece(i, j).getColour() == board.getComputerPlayer().getColour() && validateMove(board.getCurrentState().getPiece(i, j), kingLocation,board)) {
+                if (!(board.getCurrentState().getPiece(i, j).getName() == Piece.Name.EMPTY) && board.getCurrentState().getPiece(i, j).getColour() != piece.getColour() && validateMove(board.getCurrentState().getPiece(i, j), kingLocation, board)) {
                     result = true;
                     break;
                 }
@@ -224,12 +232,11 @@ public class MoveEngine {
     }
 
 
-
-    private Location getKingLocation(Piece piece, Board board) {
+    private Location getKingLocation(Colour colour, Board board) {
 
         for (int i = 0; i < board.getCurrentState().getState().length; i++) {
             for (int j = 0; j < board.getCurrentState().getState().length; j++) {
-                if (!(board.getCurrentState().getPiece(i, j).getName() == Piece.Name.EMPTY) && board.getCurrentState().getPiece(i, j).getColour() == piece.getColour() && board.getCurrentState().getPiece(i, j).getName() == Piece.Name.KING) {
+                if (!(board.getCurrentState().getPiece(i, j).getName() == Piece.Name.EMPTY) && board.getCurrentState().getPiece(i, j).getColour() == colour && board.getCurrentState().getPiece(i, j).getName() == Piece.Name.KING) {
                     return board.getCurrentState().getPiece(i, j).getLocation();
                 }
             }

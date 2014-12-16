@@ -95,7 +95,7 @@ public class HumanPlayer extends Player {
                                      for (int i = 25; i < 825; i += 100) { //X
                                          for (int j = 25; j < 825; j += 100) { //Y
                                              if (x > i && x < i + 100 && y > j && y < j + 100) {
-                                                 if (getColour() == Colour.WHITE) {
+                                                 if (board.getWhitePlayer().getClass() == HumanPlayer.class) {
                                                      row = 7 - ((j - 25) / 100);
                                                      column = (i - 25) / 100;
                                                  } else {
@@ -108,8 +108,9 @@ public class HumanPlayer extends Player {
                                      }
                                      if (row != -1 && column != -1) {  //if row/column has actually been clicked
                                          if (e.getButton() == MouseEvent.BUTTON1) { //left click
-                                             resetHighlight();
                                              if (board.getCurrentState().getPiece(column, row).getName() != Piece.Name.EMPTY && board.getCurrentState().getPiece(column, row).getColour() == getColour()) { //if its not an empty selection and the right colour is selected
+                                                 resetHighlight(); //clears all highlighted pieces
+                                                 moveEngine.highlightCheck(); //highlight the king if in check
                                                  selected = board.getCurrentState().getPiece(column, row);
                                                  selected.setLocation(new Location(column, row)); //setting the location of the piece as it is not set prior
                                                  selected.setSelected(true);
@@ -118,8 +119,8 @@ public class HumanPlayer extends Player {
                                              }
                                          } else if (e.getButton() == MouseEvent.BUTTON3) { //right click
                                              if (selected.getName() != Piece.Name.EMPTY) {
-                                                 move.move(selected, new Location(column, row));
                                                  resetHighlight();
+                                                 move.move(selected, new Location(column, row));
                                                  gui.repaint(); //refreshes the board
                                                  selected = new Empty(Piece.Name.EMPTY, Colour.NEUTRAL); //unselect it
                                              }
@@ -164,6 +165,7 @@ public class HumanPlayer extends Player {
                 Piece temp = board.getCurrentState().getPiece(j, i);
                 temp.setPossibleMove(false);
                 temp.setSelected(false);
+                temp.setInCheck(false);
             }
         }
     }

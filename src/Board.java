@@ -7,8 +7,8 @@
 
 public class Board {
     private State currentState = new State();
-    private HumanPlayer humanPlayer;
-    private ComputerPlayer computerPlayer;
+    private Player whitePlayer, blackPlayer;
+
     private GUI gui;
     public Board(GUI gui) {
         if (!(gui == null)) {
@@ -58,21 +58,7 @@ public class Board {
         }
     }
 
-    public HumanPlayer getHumanPlayer() {
-        return humanPlayer;
-    }
 
-    public void setHumanPlayer(HumanPlayer humanPlayer) {
-        this.humanPlayer = humanPlayer;
-    }
-
-    public ComputerPlayer getComputerPlayer() {
-        return computerPlayer;
-    }
-
-    public void setComputerPlayer(ComputerPlayer computerPlayer) {
-        this.computerPlayer = computerPlayer;
-    }
 
     //only to be used by MoveEngine
     public void move(Location startLocation, Location endLocation) {
@@ -90,6 +76,21 @@ public class Board {
         return currentState;
     }
 
+    public Player getWhitePlayer() {
+        return whitePlayer;
+    }
+
+    public void setWhitePlayer(Player whitePlayer) {
+        this.whitePlayer = whitePlayer;
+    }
+
+    public Player getBlackPlayer() {
+        return blackPlayer;
+    }
+
+    public void setBlackPlayer(Player blackPlayer) {
+        this.blackPlayer = blackPlayer;
+    }
 
     public void displayBoard() {
         for (int m = 7; m >= 0; m--) {
@@ -124,8 +125,8 @@ public class Board {
         }
         Board tempBoard = new Board(null);
         tempBoard.getCurrentState().setState(temp);
-        tempBoard.setComputerPlayer(this.getComputerPlayer());
-        tempBoard.setHumanPlayer(this.getHumanPlayer());
+        tempBoard.setWhitePlayer(this.whitePlayer);
+        tempBoard.setBlackPlayer(this.blackPlayer);
         return tempBoard;
     }
 }
