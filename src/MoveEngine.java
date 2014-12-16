@@ -94,36 +94,40 @@ public class MoveEngine {
         int xDif = Math.abs(piece.getLocation().getX() - toLocation.getX());
         int yDif = Math.abs(piece.getLocation().getY() - toLocation.getY());
         int maxSpaces = 1;
-
-        if (piece.getLocation().getY() < toLocation.getY()) { //Moving up
-            if (piece.getLocation().getX() > toLocation.getX()) {            //Moving left
-                for (int i = 1; i < xDif; i++) {
-                    if (board.getCurrentState().getPiece(piece.getLocation().getX() - i, piece.getLocation().getY() + i).getName() == Piece.Name.EMPTY) {
-                        maxSpaces++; //No piece in the way
+        try {
+            if (piece.getLocation().getY() < toLocation.getY()) { //Moving up
+                if (piece.getLocation().getX() > toLocation.getX()) {            //Moving left
+                    for (int i = 1; i < xDif; i++) {
+                        if (board.getCurrentState().getPiece(piece.getLocation().getX() - i, piece.getLocation().getY() + i).getName() == Piece.Name.EMPTY) {
+                            maxSpaces++; //No piece in the way
+                        }
+                    }
+                } else if (piece.getLocation().getX() < toLocation.getX()) {            //Moving right
+                    for (int i = 1; i < xDif; i++) {
+                        if (board.getCurrentState().getPiece(piece.getLocation().getX() + i, piece.getLocation().getY() + i).getName() == Piece.Name.EMPTY) {
+                            maxSpaces++;//No piece in the way
+                        }
                     }
                 }
-            } else if (piece.getLocation().getX() < toLocation.getX()) {            //Moving right
-                for (int i = 1; i < xDif; i++) {
-                    if (board.getCurrentState().getPiece(piece.getLocation().getX() + i, piece.getLocation().getY() + i).getName() == Piece.Name.EMPTY) {
-                        maxSpaces++;//No piece in the way
+            } else {//Moving down
+                if (piece.getLocation().getX() > toLocation.getX()) {            //Moving left
+                    for (int i = 1; i < xDif; i++) {
+                        if (board.getCurrentState().getPiece(piece.getLocation().getX() - i, piece.getLocation().getY() - i).getName() == Piece.Name.EMPTY) {
+                            maxSpaces++;//No piece in the way
+                        }
+                    }
+                } else if (piece.getLocation().getX() < toLocation.getX()) {            //Moving right
+                    for (int i = 1; i < xDif; i++) {
+                        if (board.getCurrentState().getPiece(piece.getLocation().getX() + i, piece.getLocation().getY() - i).getName() == Piece.Name.EMPTY) {
+                            maxSpaces++;//No piece in the way
+                        }
                     }
                 }
             }
-        } else {//Moving down
-            if (piece.getLocation().getX() > toLocation.getX()) {            //Moving left
-                for (int i = 1; i < xDif; i++) {
-                    if (board.getCurrentState().getPiece(piece.getLocation().getX() - i, piece.getLocation().getY() - i).getName() == Piece.Name.EMPTY) {
-                        maxSpaces++;//No piece in the way
-                    }
-                }
-            } else if (piece.getLocation().getX() < toLocation.getX()) {            //Moving right
-                for (int i = 1; i < xDif; i++) {
-                    if (board.getCurrentState().getPiece(piece.getLocation().getX() + i, piece.getLocation().getY() - i).getName() == Piece.Name.EMPTY) {
-                        maxSpaces++;//No piece in the way
-                    }
-                }
-            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            //Do nothing
         }
+
         if (xDif == yDif && xDif == maxSpaces) {//Moving diagonally with no one in between
             return endPiece.getColour() != piece.getColour(); //Empty or enemy
         } else {
