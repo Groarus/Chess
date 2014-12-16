@@ -1,3 +1,5 @@
+import java.util.Stack;
+
 /**
  * Project: Chess
  * Course: COSC 3P71 - Final Project
@@ -56,17 +58,16 @@ public class MoveEngine {
             If it is moving diagonally and the space has an enemy piece, allow it to be taken
          */
         if (yDif <= maxSpaces & ((piece.getColour() == Colour.BLACK & piece.getLocation().getY() > toLocation.getY()) | (piece.getColour() == Colour.WHITE & piece.getLocation().getY() < toLocation.getY()))) {
-            if (piece.getLocation().getX() == toLocation.getX() & endPiece == null) {
+            if (piece.getLocation().getX() == toLocation.getX() & endPiece.getName() == Piece.Name.EMPTY) {
                 return true;
-            } else return endPiece != null && endPiece.getColour() != piece.getColour() && xDif == 1 && yDif == 1; //Pawn Capture
+            } else
+                return endPiece.getName() != Piece.Name.EMPTY && endPiece.getColour() != piece.getColour() && xDif == 1 && yDif == 1; //Pawn Capture
         } else {
             return false;
         }
     }
 
     private boolean knightCheck(Piece piece, Location toLocation) {
-        System.out.println("No. of active thread: " + Thread.activeCount());
-
         Piece endPiece = board.getCurrentState().getPiece(toLocation.getX(), toLocation.getY());
         int xDif = Math.abs(piece.getLocation().getX() - toLocation.getX());
         int yDif = Math.abs(piece.getLocation().getY() - toLocation.getY());
@@ -82,7 +83,7 @@ public class MoveEngine {
          */
 
         if (xDif <= maxSpaces & yDif <= maxSpaces & xDif > 0 & yDif > 0 & (yDif + xDif == maxSpaces)) {
-            return endPiece == null || endPiece.getColour() != piece.getColour();
+            return endPiece.getColour() != piece.getColour();
         } else {
             return false;
         }
@@ -97,13 +98,13 @@ public class MoveEngine {
         if (piece.getLocation().getY() < toLocation.getY()) { //Moving up
             if (piece.getLocation().getX() > toLocation.getX()) {            //Moving left
                 for (int i = 1; i < xDif; i++) {
-                    if (board.getCurrentState().getPiece(piece.getLocation().getX() - i, piece.getLocation().getY() + i) == null) {
+                    if (board.getCurrentState().getPiece(piece.getLocation().getX() - i, piece.getLocation().getY() + i).getName() == Piece.Name.EMPTY) {
                         maxSpaces++; //No piece in the way
                     }
                 }
             } else if (piece.getLocation().getX() < toLocation.getX()) {            //Moving right
                 for (int i = 1; i < xDif; i++) {
-                    if (board.getCurrentState().getPiece(piece.getLocation().getX() + i, piece.getLocation().getY() + i) == null) {
+                    if (board.getCurrentState().getPiece(piece.getLocation().getX() + i, piece.getLocation().getY() + i).getName() == Piece.Name.EMPTY) {
                         maxSpaces++;//No piece in the way
                     }
                 }
@@ -111,20 +112,20 @@ public class MoveEngine {
         } else {//Moving down
             if (piece.getLocation().getX() > toLocation.getX()) {            //Moving left
                 for (int i = 1; i < xDif; i++) {
-                    if (board.getCurrentState().getPiece(piece.getLocation().getX() - i, piece.getLocation().getY() - i) == null) {
+                    if (board.getCurrentState().getPiece(piece.getLocation().getX() - i, piece.getLocation().getY() - i).getName() == Piece.Name.EMPTY) {
                         maxSpaces++;//No piece in the way
                     }
                 }
             } else if (piece.getLocation().getX() < toLocation.getX()) {            //Moving right
                 for (int i = 1; i < xDif; i++) {
-                    if (board.getCurrentState().getPiece(piece.getLocation().getX() + i, piece.getLocation().getY() - i) == null) {
+                    if (board.getCurrentState().getPiece(piece.getLocation().getX() + i, piece.getLocation().getY() - i).getName() == Piece.Name.EMPTY) {
                         maxSpaces++;//No piece in the way
                     }
                 }
             }
         }
         if (xDif == yDif && xDif == maxSpaces) {//Moving diagonally with no one in between
-            return endPiece == null || endPiece.getColour() != piece.getColour(); //Empty or enemy
+            return endPiece.getColour() != piece.getColour(); //Empty or enemy
         } else {
             return false;
         }
@@ -139,32 +140,32 @@ public class MoveEngine {
         //Four ifs to check if there is nothing in between where it needs to go
         if (piece.getLocation().getY() < toLocation.getY()) { //Moving up
             for (int i = 1; i < yDif; i++) {
-                if (board.getCurrentState().getPiece(piece.getLocation().getX(), piece.getLocation().getY() + i) == null) {
+                if (board.getCurrentState().getPiece(piece.getLocation().getX(), piece.getLocation().getY() + i).getName() == Piece.Name.EMPTY) {
                     maxSpaces++; //No piece in the way
                 }
             }
         } else if (piece.getLocation().getY() > toLocation.getY()) {//Moving down
             for (int i = 1; i < yDif; i++) {
-                if (board.getCurrentState().getPiece(piece.getLocation().getX(), piece.getLocation().getY() - i) == null) {
+                if (board.getCurrentState().getPiece(piece.getLocation().getX(), piece.getLocation().getY() - i).getName() == Piece.Name.EMPTY) {
                     maxSpaces++;//No piece in the way
                 }
             }
         } else if (piece.getLocation().getX() > toLocation.getX()) {//Moving left
             for (int i = 1; i < xDif; i++) {
-                if (board.getCurrentState().getPiece(piece.getLocation().getX() - i, piece.getLocation().getY()) == null) {
+                if (board.getCurrentState().getPiece(piece.getLocation().getX() - i, piece.getLocation().getY()).getName() == Piece.Name.EMPTY) {
                     maxSpaces++;//No piece in the way
                 }
             }
         } else if (piece.getLocation().getX() < toLocation.getX()) {//Moving right
             for (int i = 1; i < xDif; i++) {
-                if (board.getCurrentState().getPiece(piece.getLocation().getX() + i, piece.getLocation().getY()) == null) {
+                if (board.getCurrentState().getPiece(piece.getLocation().getX() + i, piece.getLocation().getY()).getName() == Piece.Name.EMPTY) {
                     maxSpaces++;//No piece in the way
                 }
             }
         }
 
         if (((xDif == 0 & yDif > 0) || (yDif == 0 & xDif > 0)) && ((yDif == maxSpaces) || (xDif == maxSpaces))) {
-            return endPiece == null || endPiece.getColour() != piece.getColour();
+            return endPiece.getColour() != piece.getColour();
         } else {
             return false;
         }
@@ -178,12 +179,25 @@ public class MoveEngine {
         int maxSpaces = 1;
 
         if ((xDif >= 0 & yDif >= 0) && ((yDif <= maxSpaces) && (xDif <= maxSpaces))) {
-            return endPiece == null || endPiece.getColour() != piece.getColour();
+            return endPiece.getColour() != piece.getColour();
         } else {
             return false;
         }
         //Going to need to add Check clause since kings cant move into Check
+
+        //No piece can be moved that will either expose the king of the same colour to check or leave that king in check.***
     }
 
-    public Board getBoard(){return this.board;}
+    public Stack<Location> getPossibleMoves(Piece piece) {
+        Stack<Location> possible = new Stack<Location>();
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                Location temp = new Location(i, j);
+                if (validateMove(piece, temp)) {
+                    possible.push(temp);
+                }
+            }
+        }
+        return possible;
+    }
 }

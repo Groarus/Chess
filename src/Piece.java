@@ -15,6 +15,7 @@ public abstract class Piece {
     private Name name;
     private Status status;
     private double value;
+    private boolean selected, possibleMove;
 
     public Piece(Name name, Colour colour) {
         this.colour = colour;
@@ -60,11 +61,27 @@ public abstract class Piece {
         this.prevLocation = prevLocation;
     }
 
+    public boolean isPossibleMove() {
+        return possibleMove;
+    }
+
+    public void setPossibleMove(boolean possibleMove) {
+        this.possibleMove = possibleMove;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
     enum Status {
         ALIVE, DEAD;
     }
 
     enum Name {
-        BISHOP, KING, KNIGHT, PAWN, QUEEN, ROOK;
+        BISHOP, KING, KNIGHT, PAWN, QUEEN, ROOK, EMPTY;
     }
 }

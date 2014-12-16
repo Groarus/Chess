@@ -25,14 +25,18 @@ public class State {
         this.state = state;
     }
 
-    public void setPiece(int m, int n, Piece piece) {
-        state[m][n] = piece;
+    public void setPiece(int x, int y, Piece piece) {
+        state[x][y] = piece;
         if (!(piece == null)) {
-            state[m][n].setLocation(new Location(m, n));
+            state[x][y].setLocation(new Location(x, y));
         }
     }
 
-    public Piece getPiece(int m, int n) {
-        return state[m][n];
+    public Piece getPiece(int x, int y) {
+        return state[x][y];
+    }
+
+    public Piece getPiece(Location location) {
+        return state[location.getX()][location.getY()];
     }
 }

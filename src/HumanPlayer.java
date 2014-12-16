@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Stack;
 
 
 /**
@@ -13,7 +14,7 @@ import java.awt.event.MouseListener;
  */
 public class HumanPlayer extends Player {
 
-    private Piece selected = null;
+    private Piece selected = new Empty(Piece.Name.EMPTY, Colour.NEUTRAL);
     private JPanel panel;
     private JLabel selectedLabel = new JLabel("None");
     private JLabel numMovesLabel = new JLabel("0");
@@ -107,13 +108,16 @@ public class HumanPlayer extends Player {
                                      }
                                      if (row != -1 && column != -1) {  //if row/column has actually been clicked
                                          if (e.getButton() == MouseEvent.BUTTON1) { //left click
-                                             if (board.getCurrentState().getPiece(column, row) != null && board.getCurrentState().getPiece(column, row).getColour() == getColour()) { //if its not an empty selection and the right colour is selected
+                                             resetHighlight();
+                                             if (board.getCurrentState().getPiece(column, row).getName() != Piece.Name.EMPTY && board.getCurrentState().getPiece(column, row).getColour() == getColour()) { //if its not an empty selection and the right colour is selected
                                                  selected = board.getCurrentState().getPiece(column, row);
                                                  selected.setLocation(new Location(column, row)); //setting the location of the piece as it is not set prior
-                                                 selectedLabel.setText(selected.printLocation() + "\t-\t" + selected.getName().name()); //change the selected piece in the side panel
+                                                 selected.setSelected(true);
+                                                 possibleMove();
+                                                 gui.repaint();
                                              }
                                          } else if (e.getButton() == MouseEvent.BUTTON3) { //right click
-                                             if (selected != null) {
+                                             if (selected.getName() != Piece.Name.EMPTY) {
                                                  //Save piece array in temp var
                                                  //execute move, check for Check. If in Check move piece back.
                                                  //Reload the piece array
@@ -128,10 +132,9 @@ public class HumanPlayer extends Player {
                                                      board.getCurrentState().setState(temp);
                                                      //Display message
                                                  }
-                                                 //Put another if statement here to check if it puts computer in Check.
+                                                 resetHighlight();
                                                  gui.repaint(); //refreshes the board
-                                                 selected = null; //unselect it
-                                                 selectedLabel.setText("None");
+                                                 selected = new Empty(Piece.Name.EMPTY, Colour.NEUTRAL); //unselect it
                                              }
                                          }
                                      }
@@ -158,8 +161,24 @@ public class HumanPlayer extends Player {
                                  }
 
                              }
-
         );
+    }
+
+    private void possibleMove() {
+        Stack<Location> possible = moveEngine.getPossibleMoves(selected);
+
+        while (!possible.isEmpty())
+            board.getCurrentState().getPiece(possible.pop()).setPossibleMove(true);
+    }
+
+    private void resetHighlight() {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                Piece temp = board.getCurrentState().getPiece(j, i);
+                temp.setPossibleMove(false);
+                temp.setSelected(false);
+            }
+        }
     }
 
     private boolean isInCheck() {
@@ -167,7 +186,7 @@ public class HumanPlayer extends Player {
         Location kingLocation = getKingLocation();
         for (int i = 0; i < board.getCurrentState().getState().length; i++) {
             for (int j = 0; j < board.getCurrentState().getState().length; j++) {
-                if (!(board.getCurrentState().getPiece(i, j) == null) && board.getCurrentState().getPiece(i, j).getColour() == board.getComputerPlayer().getColour() && move.validateMove(board.getCurrentState().getPiece(i, j), kingLocation)) {
+                if (!(board.getCurrentState().getPiece(i, j).getName() == Piece.Name.EMPTY) && board.getCurrentState().getPiece(i, j).getColour() == board.getComputerPlayer().getColour() && move.validateMove(board.getCurrentState().getPiece(i, j), kingLocation)) {
                     result = true;
                     break;
                 }
@@ -180,10 +199,9 @@ public class HumanPlayer extends Player {
 
         for (int i = 0; i < board.getCurrentState().getState().length; i++) {
             for (int j = 0; j < board.getCurrentState().getState().length; j++) {
-                if (!(board.getCurrentState().getPiece(i, j) == null) && board.getCurrentState().getPiece(i, j).getColour() == this.getColour() && board.getCurrentState().getPiece(i, j).getName() == Piece.Name.KING) {
+                if (!(board.getCurrentState().getPiece(i, j).getName() == Piece.Name.EMPTY) && board.getCurrentState().getPiece(i, j).getColour() == this.getColour() && board.getCurrentState().getPiece(i, j).getName() == Piece.Name.KING) {
                     return board.getCurrentState().getPiece(i, j).getLocation();
                 }
-
             }
         }
         return null; //No King...Should never happen

@@ -48,6 +48,12 @@ public class Board {
         for (int i = 0; i < 8; i++) {
             currentState.setPiece(i, 6, new Pawn(Colour.BLACK));
         }
+        //empty places
+        for (int j = 2; j < 6; j++) {
+            for (int i = 0; i < 8; i++) {
+                currentState.setPiece(i, j, new Empty(Piece.Name.EMPTY, Colour.NEUTRAL));
+            }
+        }
     }
 
     public HumanPlayer getHumanPlayer() {
@@ -57,16 +63,21 @@ public class Board {
     public void setHumanPlayer(HumanPlayer humanPlayer) {
         this.humanPlayer = humanPlayer;
     }
-    public void setComputerPlayer(ComputerPlayer computerPlayer){this.computerPlayer = computerPlayer;}
 
-    public ComputerPlayer getComputerPlayer() {return computerPlayer;}
+    public ComputerPlayer getComputerPlayer() {
+        return computerPlayer;
+    }
+
+    public void setComputerPlayer(ComputerPlayer computerPlayer) {
+        this.computerPlayer = computerPlayer;
+    }
 
     //only to be used by MoveEngine
     public void move(Location startLocation, Location endLocation) {
         int startX = startLocation.getX(), startY = startLocation.getY(), endX = endLocation.getX(), endY = endLocation.getY();
 
         currentState.setPiece(endX, endY, currentState.getPiece(startX, startY));//moving the piece
-        currentState.setPiece(startX, startY, null); //old location to null
+        currentState.setPiece(startX, startY, new Empty(Piece.Name.EMPTY, Colour.NEUTRAL)); //old location to null
         currentState.getPiece(endX, endY).setLocation(new Location(endX, endY)); //setting the new location of the piece
         currentState.getPiece(endX, endY).setPrevLocation(new Location(startX, startY)); //setting the previous location
 
@@ -83,7 +94,7 @@ public class Board {
             System.out.println("\n----------------------------------------------------------------------------------------------------------------------------");
             System.out.print(" " + (m + 1) + " | ");
             for (int n = 0; n < 8; n++) {
-                if (currentState.getPiece(n, m) != null) {
+                if (currentState.getPiece(n, m).getName() != Piece.Name.EMPTY) {
                     String name = currentState.getPiece(n, m).getName().toString();
                     String message;
                     if (name.length() == 4)
