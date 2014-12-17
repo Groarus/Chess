@@ -7,12 +7,10 @@ import java.awt.*;
  * Course: COSC 3P71 - Final Project
  * Created: December, 2014
  */
-public class ComputerPlayer extends Player {
+public class ComputerPlayer extends Player implements Runnable {
 
-
-    public ComputerPlayer(Colour colour, Board board, GUI gui) {
-        super(colour, board, gui);
-
+    public ComputerPlayer(Colour colour, Board board, GUI gui, Turn turn) {
+        super(colour, board, gui, turn);
         //set up the GUI
         infoPanel();
         gui.addSidePanel(panel);
@@ -34,5 +32,18 @@ public class ComputerPlayer extends Player {
         panel.add(computer, constraints);
     }
 
+    private void selectAndMove(){
+        //Method to select a piece and move piece.
+        getTurn().next();
+    }
+
+    public void run() {
+        while (true) {
+            if (getTurn().getTurn() == getColour()){
+                selectAndMove();
+            }
+        }
+
+    }
 
 }

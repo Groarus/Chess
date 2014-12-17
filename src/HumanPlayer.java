@@ -22,8 +22,8 @@ public class HumanPlayer extends Player implements Runnable {
     private Boolean clickFlag = false;
     private MouseEvent mouseEvent;
 
-    public HumanPlayer(Colour colour, Board board, GUI gui) {
-        super(colour, board, gui);
+    public HumanPlayer(Colour colour, Board board, GUI gui, Turn turn) {
+        super(colour, board, gui, turn);
         this.move = new MoveEngine(board);
         this.board = board;
         //set up the gui
@@ -32,52 +32,56 @@ public class HumanPlayer extends Player implements Runnable {
         guiListener();
     }
 
+
     @Override
     public void run() {
         while (true) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            if (clickFlag) {
-                int x = mouseEvent.getX();
-                int y = mouseEvent.getY() - 25;
-                int row = -1, column = -1;
+            if (getTurn().getTurn() == getColour()) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (clickFlag) {
+                    int x = mouseEvent.getX();
+                    int y = mouseEvent.getY() - 25;
+                    int row = -1, column = -1;
 
-                //This loop gets the column/row of where the mouse clicks
-                loop:
-                for (int i = 25; i < 825; i += 100) { //X
-                    for (int j = 25; j < 825; j += 100) { //Y
-                        if (x > i && x < i + 100 && y > j && y < j + 100) {
-                            if (board.getWhitePlayer().getClass() == HumanPlayer.class) {
-                                row = 7 - ((j - 25) / 100);
-                                column = (i - 25) / 100;
-                            } else {
-                                row = (j - 25) / 100;
-                                column = 7 - (i - 25) / 100;
+                    //This loop gets the column/row of where the mouse clicks
+                    loop:
+                    for (int i = 25; i < 825; i += 100) { //X
+                        for (int j = 25; j < 825; j += 100) { //Y
+                            if (x > i && x < i + 100 && y > j && y < j + 100) {
+                                if (board.getWhitePlayer().getClass() == HumanPlayer.class) {
+                                    row = 7 - ((j - 25) / 100);
+                                    column = (i - 25) / 100;
+                                } else {
+                                    row = (j - 25) / 100;
+                                    column = 7 - (i - 25) / 100;
+                                }
+                                break loop;
                             }
-                            break loop;
                         }
                     }
-                }
-                if (row != -1 && column != -1) {  //if row/column has actually been clicked
-                    if (mouseEvent.getButton() == MouseEvent.BUTTON1) { //left click
-                        if (board.getCurrentState().getPiece(column, row).getName() != Piece.Name.EMPTY && board.getCurrentState().getPiece(column, row).getColour() == getColour()) { //if its not an empty selection and the right colour is selected
-                            resetHighlight(); //clears all highlighted pieces
-                            moveEngine.highlightCheck(); //highlight the king if in check
-                            selected = board.getCurrentState().getPiece(column, row);
-                            selected.setLocation(new Location(column, row)); //setting the location of the piece as it is not set prior
-                            selected.setSelected(true);
-                            possibleMove();
-                            gui.repaint();
-                        }
-                    } else if (mouseEvent.getButton() == MouseEvent.BUTTON3) { //right click
-                        if (selected.getName() != Piece.Name.EMPTY) {
-                            resetHighlight();
-                            move.move(selected, new Location(column, row));
-                            gui.repaint(); //refreshes the board
-                            selected = new Empty(Piece.Name.EMPTY, Colour.NEUTRAL); //unselect it
+                    if (row != -1 && column != -1) {  //if row/column has actually been clicked
+                        if (mouseEvent.getButton() == MouseEvent.BUTTON1) { //left click
+                            if (board.getCurrentState().getPiece(column, row).getName() != Piece.Name.EMPTY && board.getCurrentState().getPiece(column, row).getColour() == getColour()) { //if its not an empty selection and the right colour is selected
+                                resetHighlight(); //clears all highlighted pieces
+                                moveEngine.highlightCheck(); //highlight the king if in check
+                                selected = board.getCurrentState().getPiece(column, row);
+                                selected.setLocation(new Location(column, row)); //setting the location of the piece as it is not set prior
+                                selected.setSelected(true);
+                                possibleMove();
+                                gui.repaint();
+                            }
+                        } else if (mouseEvent.getButton() == MouseEvent.BUTTON3) { //right click
+                            if (selected.getName() != Piece.Name.EMPTY) {
+                                resetHighlight();
+                                move.move(selected, new Location(column, row)); //MAIN MOVEMENT OF PLAYER
+                                getTurn().next();
+                                gui.repaint(); //refreshes the board
+                                selected = new Empty(Piece.Name.EMPTY, Colour.NEUTRAL); //unselect it
+                            }
                         }
                     }
                 }

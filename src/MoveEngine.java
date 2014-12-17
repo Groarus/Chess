@@ -17,17 +17,17 @@ public class MoveEngine {
     public boolean validateMove(Piece piece, Location toLocation, Board board) {
         switch (piece.getName()) {
             case PAWN:
-                return pawnCheck(piece, toLocation,board);
+                return pawnCheck(piece, toLocation, board);
             case KNIGHT:
-                return knightCheck(piece, toLocation,board);
+                return knightCheck(piece, toLocation, board);
             case BISHOP:
-                return bishopCheck(piece, toLocation,board);
+                return bishopCheck(piece, toLocation, board);
             case ROOK:
-                return rookCheck(piece, toLocation,board);
+                return rookCheck(piece, toLocation, board);
             case QUEEN:
-                return rookCheck(piece, toLocation,board) || bishopCheck(piece, toLocation,board);
+                return rookCheck(piece, toLocation, board) || bishopCheck(piece, toLocation, board);
             case KING:
-                return kingCheck(piece, toLocation,board);
+                return kingCheck(piece, toLocation, board);
         }
 
         return true;//temporarily, so other pieces can still be moved
@@ -35,7 +35,7 @@ public class MoveEngine {
 
 
     public void move(Piece piece, Location toLocation) {
-        if (validateMove(piece, toLocation,this.board) && canMove(piece, toLocation)) {
+        if (validateMove(piece, toLocation, this.board) && canMove(piece, toLocation)) {
             boolean overtaken = false;
             if (board.getCurrentState().getPiece(toLocation).getColour() != Colour.NEUTRAL && board.getCurrentState().getPiece(toLocation).getColour() != piece.getColour())
                 overtaken = true;
@@ -55,7 +55,7 @@ public class MoveEngine {
         }
     }
 
-    private boolean pawnCheck(Piece piece, Location toLocation,Board board) {
+    private boolean pawnCheck(Piece piece, Location toLocation, Board board) {
         Piece endPiece = board.getCurrentState().getPiece(toLocation.getX(), toLocation.getY());
         int xDif = Math.abs(piece.getLocation().getX() - toLocation.getX());
         int yDif = Math.abs(piece.getLocation().getY() - toLocation.getY());
@@ -75,7 +75,7 @@ public class MoveEngine {
             if (piece.getLocation().getX() == toLocation.getX() & endPiece.getName() == Piece.Name.EMPTY) {
                 return true;
             } else
-                return endPiece.getName() != Piece.Name.EMPTY && endPiece.getColour() != piece.getColour() && xDif == 1 && yDif == 1 ; //Pawn Capture
+                return endPiece.getName() != Piece.Name.EMPTY && endPiece.getColour() != piece.getColour() && xDif == 1 && yDif == 1; //Pawn Capture
         } else {
             return false;
         }
@@ -97,13 +97,13 @@ public class MoveEngine {
          */
 
         if (xDif <= maxSpaces & yDif <= maxSpaces & xDif > 0 & yDif > 0 & (yDif + xDif == maxSpaces)) {
-            return endPiece.getColour() != piece.getColour() ;
+            return endPiece.getColour() != piece.getColour();
         } else {
             return false;
         }
     }
 
-    private boolean bishopCheck(Piece piece, Location toLocation,Board board) {
+    private boolean bishopCheck(Piece piece, Location toLocation, Board board) {
         Piece endPiece = board.getCurrentState().getPiece(toLocation.getX(), toLocation.getY());
         int xDif = Math.abs(piece.getLocation().getX() - toLocation.getX());
         int yDif = Math.abs(piece.getLocation().getY() - toLocation.getY());
@@ -143,7 +143,7 @@ public class MoveEngine {
         }
 
         if (xDif == yDif && xDif == maxSpaces) {//Moving diagonally with no one in between
-            return endPiece.getColour() != piece.getColour() ; //Empty or enemy
+            return endPiece.getColour() != piece.getColour(); //Empty or enemy
         } else {
             return false;
         }
@@ -183,14 +183,14 @@ public class MoveEngine {
         }
 
         if (((xDif == 0 & yDif > 0) || (yDif == 0 & xDif > 0)) && ((yDif == maxSpaces) || (xDif == maxSpaces))) {
-            return endPiece.getColour() != piece.getColour() ;
+            return endPiece.getColour() != piece.getColour();
         } else {
             return false;
         }
 
     }
 
-    private boolean kingCheck(Piece piece, Location toLocation,Board board) {
+    private boolean kingCheck(Piece piece, Location toLocation, Board board) {
         Piece endPiece = board.getCurrentState().getPiece(toLocation.getX(), toLocation.getY());
         int xDif = Math.abs(piece.getLocation().getX() - toLocation.getX());
         int yDif = Math.abs(piece.getLocation().getY() - toLocation.getY());
@@ -262,8 +262,8 @@ public class MoveEngine {
         Board tempBoard = board.clone();
         Piece tempPiece = piece.clone();
         Location tempLocation, tempToLocation;
-        tempLocation = new Location(tempPiece.getLocation().getX(),tempPiece.getLocation().getY());
-        tempToLocation = new Location(toLocation.getX(),toLocation.getY());
+        tempLocation = new Location(tempPiece.getLocation().getX(), tempPiece.getLocation().getY());
+        tempToLocation = new Location(toLocation.getX(), toLocation.getY());
         tempBoard.move(tempLocation, tempToLocation);
         tempPiece = tempBoard.getCurrentState().getPiece(tempToLocation);
         return !isInCheck(tempPiece, tempBoard);
