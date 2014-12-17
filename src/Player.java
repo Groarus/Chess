@@ -15,9 +15,10 @@ public class Player {
     protected JLabel piecesLeftValue = new JLabel(Integer.toString(piecesLeft));
     private Colour colour;
     protected JLabel numMovesValue = new JLabel(Integer.toString(numMoves));
+    private Turn turn;
 
-
-    public Player(Colour colour, Board board, GUI gui) {
+    public Player(Colour colour, Board board, GUI gui, Turn turn) {
+        this.turn = turn;
         this.colour = colour;
         this.board = board;
         this.gui = gui;
@@ -44,5 +45,8 @@ public class Player {
     public void decPiecesLeft() {
         this.piecesLeft--;
         piecesLeftValue.setText(Integer.toString(piecesLeft));
+    }
+    public synchronized Turn getTurn(){
+        return this.turn;
     }
 }
