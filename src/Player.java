@@ -46,7 +46,9 @@ public class Player {
         this.piecesLeft--;
         piecesLeftValue.setText(Integer.toString(piecesLeft));
     }
-    public synchronized Turn getTurn(){
+
+    public synchronized Turn getTurn() {
         return this.turn;
     }
+
 }

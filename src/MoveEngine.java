@@ -34,7 +34,7 @@ public class MoveEngine {
     }
 
 
-    public void move(Piece piece, Location toLocation) {
+    public boolean move(Piece piece, Location toLocation) {
         if (validateMove(piece, toLocation, this.board) && canMove(piece, toLocation)) {
             boolean overtaken = false;
             if (board.getCurrentState().getPiece(toLocation).getColour() != Colour.NEUTRAL && board.getCurrentState().getPiece(toLocation).getColour() != piece.getColour())
@@ -52,7 +52,9 @@ public class MoveEngine {
             }
             board.move(piece.getLocation(), toLocation);
             highlightCheck();
+            return true;
         }
+        return false;
     }
 
     private boolean pawnCheck(Piece piece, Location toLocation, Board board) {
