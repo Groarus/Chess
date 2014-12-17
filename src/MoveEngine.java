@@ -36,6 +36,20 @@ public class MoveEngine {
 
     public void move(Piece piece, Location toLocation) {
         if (validateMove(piece, toLocation,this.board) && canMove(piece, toLocation)) {
+            boolean overtaken = false;
+            if (board.getCurrentState().getPiece(toLocation).getColour() != Colour.NEUTRAL && board.getCurrentState().getPiece(toLocation).getColour() != piece.getColour())
+                overtaken = true;
+
+            //increment number of moves and decrement pieces left if overtaken == true
+            if (piece.getColour() == Colour.WHITE) {
+                board.getWhitePlayer().incrementMoves();
+                if (overtaken)
+                    board.getBlackPlayer().decPiecesLeft();
+            } else {
+                board.getBlackPlayer().incrementMoves();
+                if (overtaken)
+                    board.getWhitePlayer().decPiecesLeft();
+            }
             board.move(piece.getLocation(), toLocation);
             highlightCheck();
         }

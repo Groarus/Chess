@@ -11,7 +11,11 @@ public class Player {
     protected Board board;
     protected MoveEngine moveEngine;
     protected GUI gui;
+    protected JLabel piecesLeftValue = new JLabel(Integer.toString(piecesLeft));
     private Colour colour;
+    private int numMoves = 0, piecesLeft = 16;
+    protected JLabel numMovesValue = new JLabel(Integer.toString(numMoves));
+
 
     public Player(Colour colour, Board board, GUI gui) {
         this.colour = colour;
@@ -22,5 +26,23 @@ public class Player {
 
     public Colour getColour() {
         return colour;
+    }
+
+    public int getNumMoves() {
+        return numMoves;
+    }
+
+    public void incrementMoves() {
+        this.numMoves++;
+        numMovesValue.setText(Integer.toString(numMoves));
+    }
+
+    public void incPiecesLeft() {
+        this.piecesLeft++;
+    }
+
+    public void decPiecesLeft() {
+        this.piecesLeft--;
+        piecesLeftValue.setText(Integer.toString(piecesLeft));
     }
 }

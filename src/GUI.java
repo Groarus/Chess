@@ -1,4 +1,7 @@
 import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 
@@ -46,13 +49,15 @@ public class GUI extends JFrame {
 
 
     private void setSidePanel() {
-        sidePanel = new JPanel(new GridLayout(2, 1, 10, 10));
+        sidePanel = new JPanel(new GridLayout(3, 1));
         sidePanel.setPreferredSize(new Dimension(250, 875));
-        sidePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         borderLayout.addLayoutComponent(sidePanel, BorderLayout.EAST);
     }
 
     public void addSidePanel(JPanel panel) {
+        Border border = BorderFactory.createLineBorder(Color.darkGray, 1);
+        Border margin = new EmptyBorder(10, 10, 10, 10);
+        panel.setBorder(new CompoundBorder(border, margin));
         sidePanel.add(panel);
     }
 }

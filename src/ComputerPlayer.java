@@ -21,8 +21,6 @@ public class ComputerPlayer extends Player {
     private void infoPanel() {
         panel = new JPanel(new GridBagLayout());
 
-        panel.setPreferredSize(new Dimension(250, 400));
-
         GridBagConstraints constraints = new GridBagConstraints();
 
         constraints.anchor = GridBagConstraints.FIRST_LINE_START;
