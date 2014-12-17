@@ -13,8 +13,7 @@ public class Chess {
         Board board = new Board(gui);
         Turn turn = new Turn();
         Object[] options = {"Human vs. Computer", "Human vs. Human"};
-        Thread player1 = null;
-        Thread player2 = null;
+
         int choice = JOptionPane.showOptionDialog(null, "Choose your game type", "Colour Option", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
         if (choice == 0) {
@@ -29,6 +28,7 @@ public class Chess {
                 humanPlayer = new HumanPlayer(Colour.WHITE, board, gui, turn);
                 board.setWhitePlayer(humanPlayer);
                 board.setBlackPlayer(computerPlayer);
+
             } else {
                 computerPlayer = new ComputerPlayer(Colour.WHITE, board, gui, turn);
                 gui.addSidePanel(new ControlPanel(gui));
@@ -36,8 +36,18 @@ public class Chess {
                 board.setWhitePlayer(computerPlayer);
                 board.setBlackPlayer(humanPlayer);
             }
+
             Thread humanThread = new Thread(humanPlayer);
+            Thread computerThread = new Thread(computerPlayer);
             humanThread.start();
+            computerThread.start();
+            gui.startGUI(); //makes the gui visible
+            try {
+                humanThread.join();
+                computerThread.join();
+            } catch (InterruptedException ex) {
+                System.out.println("Didn't Work");
+            }
         } else {
             HumanPlayer humanPlayer1;
             HumanPlayer humanPlayer2;
@@ -48,20 +58,19 @@ public class Chess {
             board.setBlackPlayer(humanPlayer2);
 
             //todo Do something with threads
-            player1 = new Thread(humanPlayer1);
-            player2 = new Thread(humanPlayer2);
+            Thread player1 = new Thread(humanPlayer1);
+            Thread player2 = new Thread(humanPlayer2);
             player1.start();
             player2.start();
-        }
-        gui.startGUI(); //makes the gui visible
-        try {
-            player1.join();
-            player2.join();
-        } catch (InterruptedException ex) {
-            System.out.println("Didn't Work");
+            gui.startGUI(); //makes the gui visible
+            try {
+                player1.join();
+                player2.join();
+            } catch (InterruptedException ex) {
+                System.out.println("Didn't Work");
+            }
         }
     }
-
 
     public static void main(String[] args) {
         new Chess();

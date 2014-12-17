@@ -36,12 +36,12 @@ public class HumanPlayer extends Player implements Runnable {
     @Override
     public void run() {
         while (true) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             if (getTurn().getTurn() == getColour()) {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
                 if (clickFlag) {
                     int x = mouseEvent.getX();
                     int y = mouseEvent.getY() - 25;
@@ -77,8 +77,9 @@ public class HumanPlayer extends Player implements Runnable {
                         } else if (mouseEvent.getButton() == MouseEvent.BUTTON3) { //right click
                             if (selected.getName() != Piece.Name.EMPTY) {
                                 resetHighlight();
-                                move.move(selected, new Location(column, row)); //MAIN MOVEMENT OF PLAYER
-                                getTurn().next();
+                                if(move.move(selected, new Location(column, row))) { //MAIN MOVEMENT OF PLAYER
+                                    getTurn().next();
+                                }
                                 gui.repaint(); //refreshes the board
                                 selected = new Empty(Piece.Name.EMPTY, Colour.NEUTRAL); //unselect it
                             }
