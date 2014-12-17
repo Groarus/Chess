@@ -11,10 +11,11 @@ public class Player {
     protected Board board;
     protected MoveEngine moveEngine;
     protected GUI gui;
+    private int numMoves = 0;
+    protected JLabel numMovesValue = new JLabel(Integer.toString(numMoves));
+    private int piecesLeft = 16;
     protected JLabel piecesLeftValue = new JLabel(Integer.toString(piecesLeft));
     private Colour colour;
-    private int numMoves = 0, piecesLeft = 16;
-    protected JLabel numMovesValue = new JLabel(Integer.toString(numMoves));
 
 
     public Player(Colour colour, Board board, GUI gui) {
