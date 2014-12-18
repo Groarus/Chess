@@ -14,9 +14,6 @@ public class HumanPlayer extends Player implements Runnable {
 
     private Piece selected = new Empty(Piece.Name.EMPTY, Colour.NEUTRAL);
     private JPanel panel;
-    private JLabel selectedLabel = new JLabel("None");
-    private JLabel numMovesLabel = new JLabel("0");
-    private JLabel turnLabel = new JLabel("Your Turn");
     private Board board;
     private MoveEngine move;
     private Boolean clickFlag = false;
@@ -37,11 +34,12 @@ public class HumanPlayer extends Player implements Runnable {
     public void run() {
         while (true) {
             try {
-                Thread.sleep(50);
+                Thread.sleep(150);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             if (getTurn().getTurn() == getColour()) {
+                gui.setBorder(panel, Color.red, 3);
                 if (clickFlag) {
                     int x = mouseEvent.getX();
                     int y = mouseEvent.getY() - 25;
@@ -77,7 +75,8 @@ public class HumanPlayer extends Player implements Runnable {
                         } else if (mouseEvent.getButton() == MouseEvent.BUTTON3) { //right click
                             if (selected.getName() != Piece.Name.EMPTY) {
                                 resetHighlight();
-                                if(move.move(selected, new Location(column, row))) { //MAIN MOVEMENT OF PLAYER
+                                if (move.move(selected, new Location(column, row))) { //MAIN MOVEMENT OF PLAYER
+                                    gui.setBorder(panel, Color.darkGray, 1);
                                     getTurn().next();
                                 }
                                 gui.repaint(); //refreshes the board
@@ -96,24 +95,17 @@ public class HumanPlayer extends Player implements Runnable {
 
 
         //nested panels
-        JPanel centerPanel = new JPanel(new GridLayout(3, 1));
-        panel.add(centerPanel, BorderLayout.CENTER);
         JPanel statsPanel = new JPanel(new GridBagLayout());
 
         JLabel human = new JLabel("Human");
         human.setFont(new Font("Serif", Font.BOLD, 20));
         panel.add(human, BorderLayout.NORTH);
 
-        turnLabel = new JLabel("Your Turn", JLabel.CENTER);
-        turnLabel.setFont(new Font("Serif", Font.BOLD, 16));
-        turnLabel.setForeground(Color.RED);
-        centerPanel.add(turnLabel);
-
 
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.anchor = GridBagConstraints.LINE_START;
         constraints.weightx = .3;
-        constraints.weighty = .3;
+        constraints.weighty = 0;
         constraints.gridx = 0;
         constraints.gridy = 0;
 
@@ -125,16 +117,24 @@ public class HumanPlayer extends Player implements Runnable {
         constraints.gridy = 0;
         statsPanel.add(numMovesValue, constraints);
 
+        //SPACER
         constraints.gridx = 0;
         constraints.gridy = 1;
+        statsPanel.add(new JLabel("  "), constraints);
+        constraints.gridx = 1;
+        constraints.gridy = 1;
+        statsPanel.add(new JLabel("  "), constraints);
+
+        constraints.gridx = 0;
+        constraints.gridy = 2;
         JLabel piecesLeftLabel = new JLabel("Pieces: ");
         piecesLeftLabel.setFont(new Font("Serif", Font.BOLD, 16));
         statsPanel.add(piecesLeftLabel, constraints);
 
         constraints.gridx = 1;
-        constraints.gridy = 1;
+        constraints.gridy = 2;
         statsPanel.add(piecesLeftValue, constraints);
-        centerPanel.add(statsPanel);
+        panel.add(statsPanel, BorderLayout.CENTER);
     }
 
 

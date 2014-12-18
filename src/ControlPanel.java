@@ -10,7 +10,7 @@ import java.awt.event.ActionListener;
  */
 public class ControlPanel extends JPanel {
 
-    public ControlPanel(GUI gui) {
+    public ControlPanel() {
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createLineBorder(Color.black, 3));
 
@@ -18,9 +18,16 @@ public class ControlPanel extends JPanel {
         controlsLabel.setFont(new Font("Serif", Font.BOLD, 20));
         add(controlsLabel, BorderLayout.NORTH);
 
+        JButton loadButton = new JButton("Load");
+        JButton saveButton = new JButton("Save");
         JButton quitButton = new JButton("Quit");
-        add(quitButton, BorderLayout.SOUTH);
 
+        JPanel centerPanel = new JPanel(new FlowLayout());
+        centerPanel.add(loadButton);
+        centerPanel.add(saveButton);
+        add(centerPanel, BorderLayout.CENTER);
+
+        add(quitButton, BorderLayout.SOUTH);
 
         quitButton.addActionListener(new ActionListener() {
             @Override

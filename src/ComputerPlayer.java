@@ -9,12 +9,10 @@ import java.util.Stack;
  * Created: December, 2014
  */
 public class ComputerPlayer extends Player implements Runnable {
-    private Piece selected = new Empty(Piece.Name.EMPTY, Colour.NEUTRAL);
-    private MoveEngine move;
-
-
     int row = 0; //Test variables
     int column = 6;
+    private Piece selected = new Empty(Piece.Name.EMPTY, Colour.NEUTRAL);
+    private MoveEngine move;
 
 
     public ComputerPlayer(Colour colour, Board board, GUI gui, Turn turn) {
@@ -47,7 +45,7 @@ public class ComputerPlayer extends Player implements Runnable {
         selected = board.getCurrentState().getPiece(row, column);
         selected.setLocation(new Location(row, column)); //setting the location of the piece as it is not set prior
         selected.setSelected(true);
-     //   possibleMove(); //Could use for selecting a move out of the possible moves
+        //   possibleMove(); //Could use for selecting a move out of the possible moves
 
 
         if (selected.getName() != Piece.Name.EMPTY) {
