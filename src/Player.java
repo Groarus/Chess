@@ -11,9 +11,9 @@ public class Player {
     protected Board board;
     protected MoveEngine moveEngine;
     protected GUI gui;
-    protected JLabel piecesLeftValue;
-    protected JLabel numMovesValue;
+    protected JLabel piecesLeftValue = new JLabel(Integer.toString(piecesLeft));
     private int numMoves = 0, piecesLeft = 16;
+    protected JLabel numMovesValue = new JLabel(Integer.toString(numMoves));
     private Colour colour;
     private Turn turn;
 
@@ -22,8 +22,6 @@ public class Player {
         this.colour = colour;
         this.board = board;
         this.gui = gui;
-        this.piecesLeftValue = new JLabel(Integer.toString(piecesLeft));
-        this.numMovesValue = new JLabel(Integer.toString(numMoves));
         moveEngine = new MoveEngine(board);
     }
 
