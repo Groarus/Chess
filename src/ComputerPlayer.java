@@ -1,6 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.util.Stack;
 
 
 /**
@@ -15,8 +14,8 @@ public class ComputerPlayer extends Player implements Runnable {
     private MoveEngine move;
 
 
-    public ComputerPlayer(Colour colour, Board board, GUI gui, Turn turn) {
-        super(colour, board, gui, turn);
+    public ComputerPlayer(Colour colour, Board board, GUI gui, Turn turn, MoveHistory moveHistory) {
+        super(colour, board, gui, turn, moveHistory);
         //set up the GUI
         this.move = new MoveEngine(board);
         infoPanel();
@@ -45,12 +44,12 @@ public class ComputerPlayer extends Player implements Runnable {
         selected = board.getCurrentState().getPiece(row, column);
         selected.setLocation(new Location(row, column)); //setting the location of the piece as it is not set prior
         selected.setSelected(true);
-        //   possibleMove(); //Could use for selecting a move out of the possible moves
 
 
         if (selected.getName() != Piece.Name.EMPTY) {
             column--;
             if (move.move(selected, new Location(row, column))) { //MAIN MOVEMENT OF PLAYER
+
                 getTurn().next();
             }
             gui.repaint(); //refreshes the board
@@ -66,12 +65,5 @@ public class ComputerPlayer extends Player implements Runnable {
             }
         }
 
-    }
-
-    private void possibleMove() {
-        Stack<Location> possible = moveEngine.getPossibleMoves(selected);
-
-        while (!possible.isEmpty())
-            board.getCurrentState().getPiece(possible.pop()).setPossibleMove(true);
     }
 }

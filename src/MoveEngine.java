@@ -203,9 +203,6 @@ public class MoveEngine {
         } else {
             return false;
         }
-        //Going to need to add Check clause since kings cant move into Check
-
-        //No piece can be moved that will either expose the king of the same colour to check or leave that king in check.***
     }
 
     public Stack<Location> getPossibleMoves(Piece piece) {
@@ -232,24 +229,19 @@ public class MoveEngine {
     }
 
     private boolean isInCheck(Piece piece, Board board) {
-        boolean result = false;
         Location kingLocation = getKingLocation(piece.getColour(), board);
         for (int i = 0; i < board.getCurrentState().getState().length; i++) {
             for (int j = 0; j < board.getCurrentState().getState().length; j++) {
-                //Graham changed this because getComputerPlayer doens't exist anymore, could be wrong
-//                if (!(board.getCurrentState().getPiece(i, j).getName() == Piece.Name.EMPTY) && board.getCurrentState().getPiece(i, j).getColour() == board.getComputerPlayer().getColour() && validateMove(board.getCurrentState().getPiece(i, j), kingLocation,board)) {
                 if (!(board.getCurrentState().getPiece(i, j).getName() == Piece.Name.EMPTY) && board.getCurrentState().getPiece(i, j).getColour() != piece.getColour() && validateMove(board.getCurrentState().getPiece(i, j), kingLocation, board)) {
-                    result = true;
-                    break;
+                    return true;
                 }
             }
         }
-        return result;
+        return false;
     }
 
 
     private Location getKingLocation(Colour colour, Board board) {
-
         for (int i = 0; i < board.getCurrentState().getState().length; i++) {
             for (int j = 0; j < board.getCurrentState().getState().length; j++) {
                 if (!(board.getCurrentState().getPiece(i, j).getName() == Piece.Name.EMPTY) && board.getCurrentState().getPiece(i, j).getColour() == colour && board.getCurrentState().getPiece(i, j).getName() == Piece.Name.KING) {

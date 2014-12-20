@@ -19,8 +19,8 @@ public class HumanPlayer extends Player implements Runnable {
     private Boolean clickFlag = false;
     private MouseEvent mouseEvent;
 
-    public HumanPlayer(Colour colour, Board board, GUI gui, Turn turn) {
-        super(colour, board, gui, turn);
+    public HumanPlayer(Colour colour, Board board, GUI gui, Turn turn, MoveHistory moveHistory) {
+        super(colour, board, gui, turn, moveHistory);
         this.move = new MoveEngine(board);
         this.board = board;
         //set up the gui
@@ -76,11 +76,19 @@ public class HumanPlayer extends Player implements Runnable {
                             if (selected.getName() != Piece.Name.EMPTY) {
                                 resetHighlight();
                                 if (move.move(selected, new Location(column, row))) { //MAIN MOVEMENT OF PLAYER
-                                    gui.setBorder(panel, Color.darkGray, 1);
+                                    //Piece Promotion
+                                    Piece temp = board.getCurrentState().getPiece(column, row);
+                                    if (temp.getLocation().getY() == 0 || temp.getLocation().getY() == 7)
+                                        if (temp instanceof Pawn)
+                                            board.getCurrentState().setPiece(column, row, ((Pawn) temp).convert());
+                                    //History
+                                    moveHistory.addMove(selected.getColour(), selected.getPrevLocation(), new Location(column, row));
+
+                                    gui.setBorder(panel, Color.darkGray, 1); //Info panel border
                                     getTurn().next();
                                 }
                                 gui.repaint(); //refreshes the board
-                                selected = new Empty(Piece.Name.EMPTY, Colour.NEUTRAL); //unselect it
+                                selected = new Empty(Piece.Name.EMPTY, Colour.NEUTRAL); //deselect it
                             }
                         }
                     }

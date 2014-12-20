@@ -2,15 +2,19 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 /**
  * Project: Chess
- * Course:
- * Created on 16 December, 2014
+ * Course: COSC 3P71 - Final Project
+ * Created: December, 2014
  */
 public class ControlPanel extends JPanel {
 
-    public ControlPanel() {
+    private MoveHistory moveHistory;
+
+    public ControlPanel(final MoveHistory moveHistory) {
+        this.moveHistory = moveHistory;
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createLineBorder(Color.black, 3));
 
@@ -18,12 +22,10 @@ public class ControlPanel extends JPanel {
         controlsLabel.setFont(new Font("Serif", Font.BOLD, 20));
         add(controlsLabel, BorderLayout.NORTH);
 
-        JButton loadButton = new JButton("Load");
         JButton saveButton = new JButton("Save");
         JButton quitButton = new JButton("Quit");
 
         JPanel centerPanel = new JPanel(new FlowLayout());
-        centerPanel.add(loadButton);
         centerPanel.add(saveButton);
         add(centerPanel, BorderLayout.CENTER);
 
@@ -36,5 +38,19 @@ public class ControlPanel extends JPanel {
             }
         });
 
+        saveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    moveHistory.saveGame();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+
+            }
+        });
+
     }
+
+
 }

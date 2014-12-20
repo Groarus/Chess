@@ -2,8 +2,8 @@ import javax.swing.*;
 
 /**
  * Project: Chess
- * Course:
- * Created on 15 December, 2014
+ * Course: COSC 3P71 - Final Project
+ * Created: December, 2014
  */
 public class Player {
 
@@ -11,18 +11,21 @@ public class Player {
     protected Board board;
     protected MoveEngine moveEngine;
     protected GUI gui;
-    protected JLabel piecesLeftValue = new JLabel(Integer.toString(piecesLeft));
+    protected JLabel piecesLeftValue, numMovesValue;
+    protected MoveHistory moveHistory;
     private int numMoves = 0, piecesLeft = 16;
-    protected JLabel numMovesValue = new JLabel(Integer.toString(numMoves));
     private Colour colour;
     private Turn turn;
 
-    public Player(Colour colour, Board board, GUI gui, Turn turn) {
+    public Player(Colour colour, Board board, GUI gui, Turn turn, MoveHistory moveHistory) {
         this.turn = turn;
         this.colour = colour;
         this.board = board;
         this.gui = gui;
-        moveEngine = new MoveEngine(board);
+        this.piecesLeftValue = new JLabel(Integer.toString(piecesLeft));
+        this.numMovesValue = new JLabel(Integer.toString(numMoves));
+        this.moveHistory = moveHistory;
+        this.moveEngine = new MoveEngine(board);
     }
 
     public Colour getColour() {

@@ -1,6 +1,9 @@
 /**
- * Created by Eric on 12/16/2014.
+ * Project: Chess
+ * Course: COSC 3P71 - Final Project
+ * Created: December, 2014
  */
+
 public class Turn {
     //Used to keep track of whos turn
     private Colour turn;

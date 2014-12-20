@@ -61,9 +61,7 @@ public class GUI extends JFrame {
     }
 
     public void addSidePanel(JPanel panel) {
-        Border border = BorderFactory.createLineBorder(Color.darkGray, 1);
-        Border margin = new EmptyBorder(10, 10, 10, 10);
-        panel.setBorder(new CompoundBorder(border, margin));
+        setBorder(panel, Color.darkGray, 1);
         sidePanel.add(panel);
     }
 }
