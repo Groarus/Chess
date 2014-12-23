@@ -63,10 +63,10 @@ public class HumanPlayer extends Player implements Runnable {
                     }
                     if (row != -1 && column != -1) {  //if row/column has actually been clicked
                         if (mouseEvent.getButton() == MouseEvent.BUTTON1) { //left click
-                            if (board.getCurrentState().getPiece(column, row).getName() != Piece.Name.EMPTY && board.getCurrentState().getPiece(column, row).getColour() == getColour()) { //if its not an empty selection and the right colour is selected
+                            if (board.getPiece(column, row).getName() != Piece.Name.EMPTY && board.getPiece(column, row).getColour() == getColour()) { //if its not an empty selection and the right colour is selected
                                 resetHighlight(); //clears all highlighted pieces
-                                moveEngine.highlightCheck(); //highlight the king if in check
-                                selected = board.getCurrentState().getPiece(column, row);
+                                moveEngine.highlightCheck(board); //highlight the king if in check
+                                selected = board.getPiece(column, row);
                                 selected.setLocation(new Location(column, row)); //setting the location of the piece as it is not set prior
                                 selected.setSelected(true);
                                 possibleMove();
@@ -75,12 +75,12 @@ public class HumanPlayer extends Player implements Runnable {
                         } else if (mouseEvent.getButton() == MouseEvent.BUTTON3) { //right click
                             if (selected.getName() != Piece.Name.EMPTY) {
                                 resetHighlight();
-                                if (move.move(selected, new Location(column, row))) { //MAIN MOVEMENT OF PLAYER
+                                if (move.move(selected, new Location(column, row), board)) { //MAIN MOVEMENT OF PLAYER
                                     //Piece Promotion
-                                    Piece temp = board.getCurrentState().getPiece(column, row);
+                                    Piece temp = board.getPiece(column, row);
                                     if (temp.getLocation().getY() == 0 || temp.getLocation().getY() == 7)
                                         if (temp instanceof Pawn)
-                                            board.getCurrentState().setPiece(column, row, ((Pawn) temp).convert());
+                                            board.setPiece(column, row, ((Pawn) temp).convert());
                                     //History
                                     moveHistory.addMove(selected.getColour(), selected.getPrevLocation(), new Location(column, row));
 
@@ -179,16 +179,16 @@ public class HumanPlayer extends Player implements Runnable {
     }
 
     private void possibleMove() {
-        Stack<Location> possible = moveEngine.getPossibleMoves(selected);
+        Stack<Location> possible = moveEngine.getPossibleMoves(selected, board);
 
         while (!possible.isEmpty())
-            board.getCurrentState().getPiece(possible.pop()).setPossibleMove(true);
+            board.getPiece(possible.pop()).setPossibleMove(true);
     }
 
     private void resetHighlight() {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                Piece temp = board.getCurrentState().getPiece(j, i);
+                Piece temp = board.getPiece(j, i);
                 temp.setPossibleMove(false);
                 temp.setSelected(false);
                 temp.setInCheck(false);

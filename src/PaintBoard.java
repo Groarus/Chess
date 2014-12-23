@@ -51,13 +51,13 @@ public class PaintBoard extends JPanel {
                         x = 750 - ((i * 100) + 25);
                         y = ((j * 100) + 25);
                     }
-                    if (board.getCurrentState().getPiece(i, j).isSelected())
+                    if (board.getPiece(i, j).isSelected())
                         g.drawImage(selected, x, y, null);
-                    if (board.getCurrentState().getPiece(i, j).isPossibleMove())
+                    if (board.getPiece(i, j).isPossibleMove())
                         g.drawImage(possibleMove, x, y, null);
-                    if (board.getCurrentState().getPiece(i, j).isInCheck())
+                    if (board.getPiece(i, j).isInCheck())
                         g.drawImage(inCheck, x, y, null);
-                    g.drawImage(board.getCurrentState().getPiece(i, j).getImage(), x, y, null);
+                    g.drawImage(board.getPiece(i, j).getImage(), x, y, null);
                 } catch (NullPointerException e) {
                     //Do nothing - occurs when getting image of blank space on board
                 }

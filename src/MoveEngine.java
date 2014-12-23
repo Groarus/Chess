@@ -7,58 +7,58 @@ import java.util.Stack;
  */
 public class MoveEngine {
 
-    private Board board;
+//    private State state;
 
-    public MoveEngine(Board board) {
-        this.board = board;
+    public MoveEngine(State state) {
+//        this.state = state;
     }
 
 
-    public boolean validateMove(Piece piece, Location toLocation, Board board) {
+    public boolean validateMove(Piece piece, Location toLocation, State state) {
         switch (piece.getName()) {
             case PAWN:
-                return pawnCheck(piece, toLocation, board);
+                return pawnCheck(piece, toLocation, state);
             case KNIGHT:
-                return knightCheck(piece, toLocation, board);
+                return knightCheck(piece, toLocation, state);
             case BISHOP:
-                return bishopCheck(piece, toLocation, board);
+                return bishopCheck(piece, toLocation, state);
             case ROOK:
-                return rookCheck(piece, toLocation, board);
+                return rookCheck(piece, toLocation, state);
             case QUEEN:
-                return rookCheck(piece, toLocation, board) || bishopCheck(piece, toLocation, board);
+                return rookCheck(piece, toLocation, state) || bishopCheck(piece, toLocation, state);
             case KING:
-                return kingCheck(piece, toLocation, board);
+                return kingCheck(piece, toLocation, state);
         }
 
         return true;//temporarily, so other pieces can still be moved
     }
 
 
-    public boolean move(Piece piece, Location toLocation) {
-        if (validateMove(piece, toLocation, this.board) && canMove(piece, toLocation)) {
+    public boolean move(Piece piece, Location toLocation, State state) {
+        if (validateMove(piece, toLocation, state) && canMove(piece, toLocation, state)) {
             boolean overtaken = false;
-            if (board.getCurrentState().getPiece(toLocation).getColour() != Colour.NEUTRAL && board.getCurrentState().getPiece(toLocation).getColour() != piece.getColour())
+            if (state.getPiece(toLocation).getColour() != Colour.NEUTRAL && state.getPiece(toLocation).getColour() != piece.getColour())
                 overtaken = true;
 
             //increment number of moves and decrement pieces left if overtaken == true
             if (piece.getColour() == Colour.WHITE) {
-                board.getWhitePlayer().incrementMoves();
+                state.getWhitePlayer().incrementMoves();
                 if (overtaken)
-                    board.getBlackPlayer().decPiecesLeft();
+                    state.getBlackPlayer().decPiecesLeft();
             } else {
-                board.getBlackPlayer().incrementMoves();
+                state.getBlackPlayer().incrementMoves();
                 if (overtaken)
-                    board.getWhitePlayer().decPiecesLeft();
+                    state.getWhitePlayer().decPiecesLeft();
             }
-            board.move(piece.getLocation(), toLocation);
-            highlightCheck();
+            state.movePiece(piece.getLocation(), toLocation);
+            highlightCheck(state);
             return true;
         }
         return false;
     }
 
-    private boolean pawnCheck(Piece piece, Location toLocation, Board board) {
-        Piece endPiece = board.getCurrentState().getPiece(toLocation.getX(), toLocation.getY());
+    private boolean pawnCheck(Piece piece, Location toLocation, State state) {
+        Piece endPiece = state.getPiece(toLocation.getX(), toLocation.getY());
         int xDif = Math.abs(piece.getLocation().getX() - toLocation.getX());
         int yDif = Math.abs(piece.getLocation().getY() - toLocation.getY());
 
@@ -83,8 +83,8 @@ public class MoveEngine {
         }
     }
 
-    private boolean knightCheck(Piece piece, Location toLocation, Board board) {
-        Piece endPiece = board.getCurrentState().getPiece(toLocation.getX(), toLocation.getY());
+    private boolean knightCheck(Piece piece, Location toLocation, State state) {
+        Piece endPiece = state.getPiece(toLocation.getX(), toLocation.getY());
         int xDif = Math.abs(piece.getLocation().getX() - toLocation.getX());
         int yDif = Math.abs(piece.getLocation().getY() - toLocation.getY());
         int maxSpaces = 3;
@@ -105,8 +105,8 @@ public class MoveEngine {
         }
     }
 
-    private boolean bishopCheck(Piece piece, Location toLocation, Board board) {
-        Piece endPiece = board.getCurrentState().getPiece(toLocation.getX(), toLocation.getY());
+    private boolean bishopCheck(Piece piece, Location toLocation, State state) {
+        Piece endPiece = state.getPiece(toLocation.getX(), toLocation.getY());
         int xDif = Math.abs(piece.getLocation().getX() - toLocation.getX());
         int yDif = Math.abs(piece.getLocation().getY() - toLocation.getY());
         int maxSpaces = 1;
@@ -114,13 +114,13 @@ public class MoveEngine {
             if (piece.getLocation().getY() < toLocation.getY()) { //Moving up
                 if (piece.getLocation().getX() > toLocation.getX()) {            //Moving left
                     for (int i = 1; i < xDif; i++) {
-                        if (board.getCurrentState().getPiece(piece.getLocation().getX() - i, piece.getLocation().getY() + i).getName() == Piece.Name.EMPTY) {
+                        if (state.getPiece(piece.getLocation().getX() - i, piece.getLocation().getY() + i).getName() == Piece.Name.EMPTY) {
                             maxSpaces++; //No piece in the way
                         }
                     }
                 } else if (piece.getLocation().getX() < toLocation.getX()) {            //Moving right
                     for (int i = 1; i < xDif; i++) {
-                        if (board.getCurrentState().getPiece(piece.getLocation().getX() + i, piece.getLocation().getY() + i).getName() == Piece.Name.EMPTY) {
+                        if (state.getPiece(piece.getLocation().getX() + i, piece.getLocation().getY() + i).getName() == Piece.Name.EMPTY) {
                             maxSpaces++;//No piece in the way
                         }
                     }
@@ -128,13 +128,13 @@ public class MoveEngine {
             } else {//Moving down
                 if (piece.getLocation().getX() > toLocation.getX()) {            //Moving left
                     for (int i = 1; i < xDif; i++) {
-                        if (board.getCurrentState().getPiece(piece.getLocation().getX() - i, piece.getLocation().getY() - i).getName() == Piece.Name.EMPTY) {
+                        if (state.getPiece(piece.getLocation().getX() - i, piece.getLocation().getY() - i).getName() == Piece.Name.EMPTY) {
                             maxSpaces++;//No piece in the way
                         }
                     }
                 } else if (piece.getLocation().getX() < toLocation.getX()) {            //Moving right
                     for (int i = 1; i < xDif; i++) {
-                        if (board.getCurrentState().getPiece(piece.getLocation().getX() + i, piece.getLocation().getY() - i).getName() == Piece.Name.EMPTY) {
+                        if (state.getPiece(piece.getLocation().getX() + i, piece.getLocation().getY() - i).getName() == Piece.Name.EMPTY) {
                             maxSpaces++;//No piece in the way
                         }
                     }
@@ -151,8 +151,8 @@ public class MoveEngine {
         }
     }
 
-    private boolean rookCheck(Piece piece, Location toLocation, Board board) {
-        Piece endPiece = board.getCurrentState().getPiece(toLocation.getX(), toLocation.getY());
+    private boolean rookCheck(Piece piece, Location toLocation, State state) {
+        Piece endPiece = state.getPiece(toLocation.getX(), toLocation.getY());
         int xDif = Math.abs(piece.getLocation().getX() - toLocation.getX());
         int yDif = Math.abs(piece.getLocation().getY() - toLocation.getY());
         int maxSpaces = 1;
@@ -160,25 +160,25 @@ public class MoveEngine {
         //Four ifs to check if there is nothing in between where it needs to go
         if (piece.getLocation().getY() < toLocation.getY()) { //Moving up
             for (int i = 1; i < yDif; i++) {
-                if (board.getCurrentState().getPiece(piece.getLocation().getX(), piece.getLocation().getY() + i).getName() == Piece.Name.EMPTY) {
+                if (state.getPiece(piece.getLocation().getX(), piece.getLocation().getY() + i).getName() == Piece.Name.EMPTY) {
                     maxSpaces++; //No piece in the way
                 }
             }
         } else if (piece.getLocation().getY() > toLocation.getY()) {//Moving down
             for (int i = 1; i < yDif; i++) {
-                if (board.getCurrentState().getPiece(piece.getLocation().getX(), piece.getLocation().getY() - i).getName() == Piece.Name.EMPTY) {
+                if (state.getPiece(piece.getLocation().getX(), piece.getLocation().getY() - i).getName() == Piece.Name.EMPTY) {
                     maxSpaces++;//No piece in the way
                 }
             }
         } else if (piece.getLocation().getX() > toLocation.getX()) {//Moving left
             for (int i = 1; i < xDif; i++) {
-                if (board.getCurrentState().getPiece(piece.getLocation().getX() - i, piece.getLocation().getY()).getName() == Piece.Name.EMPTY) {
+                if (state.getPiece(piece.getLocation().getX() - i, piece.getLocation().getY()).getName() == Piece.Name.EMPTY) {
                     maxSpaces++;//No piece in the way
                 }
             }
         } else if (piece.getLocation().getX() < toLocation.getX()) {//Moving right
             for (int i = 1; i < xDif; i++) {
-                if (board.getCurrentState().getPiece(piece.getLocation().getX() + i, piece.getLocation().getY()).getName() == Piece.Name.EMPTY) {
+                if (state.getPiece(piece.getLocation().getX() + i, piece.getLocation().getY()).getName() == Piece.Name.EMPTY) {
                     maxSpaces++;//No piece in the way
                 }
             }
@@ -192,8 +192,8 @@ public class MoveEngine {
 
     }
 
-    private boolean kingCheck(Piece piece, Location toLocation, Board board) {
-        Piece endPiece = board.getCurrentState().getPiece(toLocation.getX(), toLocation.getY());
+    private boolean kingCheck(Piece piece, Location toLocation, State state) {
+        Piece endPiece = state.getPiece(toLocation.getX(), toLocation.getY());
         int xDif = Math.abs(piece.getLocation().getX() - toLocation.getX());
         int yDif = Math.abs(piece.getLocation().getY() - toLocation.getY());
         int maxSpaces = 1;
@@ -205,12 +205,12 @@ public class MoveEngine {
         }
     }
 
-    public Stack<Location> getPossibleMoves(Piece piece) {
+    public Stack<Location> getPossibleMoves(Piece piece, State state) {
         Stack<Location> possible = new Stack<Location>();
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 Location temp = new Location(i, j);
-                if ((board.getCurrentState().getPiece(temp).getName() == Piece.Name.EMPTY || board.getCurrentState().getPiece(temp).getColour() != piece.getColour()) && validateMove(piece, temp, this.board) && canMove(piece, temp)) {
+                if ((state.getPiece(temp).getName() == Piece.Name.EMPTY || state.getPiece(temp).getColour() != piece.getColour()) && validateMove(piece, temp, state) && canMove(piece, temp, state)) {
                     possible.push(temp);
                 }
             }
@@ -218,21 +218,21 @@ public class MoveEngine {
         return possible;
     }
 
-    public void highlightCheck() {
+    public void highlightCheck(State state) {
         //Checks if either king is in check and highlights its location if true//
-        Piece tempKing = board.getCurrentState().getPiece(getKingLocation(Colour.BLACK, this.board));
-        if (isInCheck(tempKing, this.board))
+        Piece tempKing = state.getPiece(getKingLocation(Colour.BLACK, state));
+        if (isInCheck(tempKing, state))
             tempKing.setInCheck(true);
-        tempKing = board.getCurrentState().getPiece(getKingLocation(Colour.WHITE, this.board));
-        if (isInCheck(tempKing, this.board))
+        tempKing = state.getPiece(getKingLocation(Colour.WHITE, state));
+        if (isInCheck(tempKing, state))
             tempKing.setInCheck(true);
     }
 
-    private boolean isInCheck(Piece piece, Board board) {
-        Location kingLocation = getKingLocation(piece.getColour(), board);
-        for (int i = 0; i < board.getCurrentState().getState().length; i++) {
-            for (int j = 0; j < board.getCurrentState().getState().length; j++) {
-                if (!(board.getCurrentState().getPiece(i, j).getName() == Piece.Name.EMPTY) && board.getCurrentState().getPiece(i, j).getColour() != piece.getColour() && validateMove(board.getCurrentState().getPiece(i, j), kingLocation, board)) {
+    private boolean isInCheck(Piece piece, State state) {
+        Location kingLocation = getKingLocation(piece.getColour(), state);
+        for (int i = 0; i < state.getState().length; i++) {
+            for (int j = 0; j < state.getState().length; j++) {
+                if (!(state.getPiece(i, j).getName() == Piece.Name.EMPTY) && state.getPiece(i, j).getColour() != piece.getColour() && validateMove(state.getPiece(i, j), kingLocation, state)) {
                     return true;
                 }
             }
@@ -241,25 +241,25 @@ public class MoveEngine {
     }
 
 
-    private Location getKingLocation(Colour colour, Board board) {
-        for (int i = 0; i < board.getCurrentState().getState().length; i++) {
-            for (int j = 0; j < board.getCurrentState().getState().length; j++) {
-                if (!(board.getCurrentState().getPiece(i, j).getName() == Piece.Name.EMPTY) && board.getCurrentState().getPiece(i, j).getColour() == colour && board.getCurrentState().getPiece(i, j).getName() == Piece.Name.KING) {
-                    return board.getCurrentState().getPiece(i, j).getLocation();
+    private Location getKingLocation(Colour colour, State state) {
+        for (int i = 0; i < state.getState().length; i++) {
+            for (int j = 0; j < state.getState().length; j++) {
+                if (!(state.getPiece(i, j).getName() == Piece.Name.EMPTY) && state.getPiece(i, j).getColour() == colour && state.getPiece(i, j).getName() == Piece.Name.KING) {
+                    return state.getPiece(i, j).getLocation();
                 }
             }
         }
         return null; //No King...Should never happen
     }
 
-    private boolean canMove(Piece piece, Location toLocation) {
-        Board tempBoard = board.clone();
+    private boolean canMove(Piece piece, Location toLocation, State state) {
+        State tempstate = state.clone();
         Piece tempPiece = piece.clone();
         Location tempLocation, tempToLocation;
         tempLocation = new Location(tempPiece.getLocation().getX(), tempPiece.getLocation().getY());
         tempToLocation = new Location(toLocation.getX(), toLocation.getY());
-        tempBoard.move(tempLocation, tempToLocation);
-        tempPiece = tempBoard.getCurrentState().getPiece(tempToLocation);
-        return !isInCheck(tempPiece, tempBoard);
+        tempstate.movePiece(tempLocation, tempToLocation);
+        tempPiece = tempstate.getPiece(tempToLocation);
+        return !isInCheck(tempPiece, tempstate);
     }
 }

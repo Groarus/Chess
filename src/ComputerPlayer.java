@@ -41,14 +41,14 @@ public class ComputerPlayer extends Player implements Runnable {
     private void selectAndMove() {
         //Method to select a piece and move piece.
 
-        selected = board.getCurrentState().getPiece(row, column);
+        selected = board.getPiece(row, column);
         selected.setLocation(new Location(row, column)); //setting the location of the piece as it is not set prior
         selected.setSelected(true);
 
 
         if (selected.getName() != Piece.Name.EMPTY) {
             column--;
-            if (move.move(selected, new Location(row, column))) { //MAIN MOVEMENT OF PLAYER
+            if (move.move(selected, new Location(row, column),board)) { //MAIN MOVEMENT OF PLAYER
 
                 getTurn().next();
             }

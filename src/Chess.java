@@ -91,7 +91,7 @@ public class Chess {
                     String[] strings = move.split("\t");
                     Location fromLocation = new Location(Integer.parseInt(strings[1]), Integer.parseInt(strings[2]));
                     Location toLocation = new Location(Integer.parseInt(strings[3]), Integer.parseInt(strings[4]));
-                    board.move(fromLocation, toLocation);
+                    board.movePiece(fromLocation, toLocation);
                     if (strings[0].equals("WHITE"))
                         humanPlayer1.incrementMoves();
                     else
