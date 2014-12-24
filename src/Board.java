@@ -5,7 +5,7 @@
  */
 
 
-public class Board extends State{
+public class Board extends State {
     private GUI gui;
 
     public Board(GUI gui) {

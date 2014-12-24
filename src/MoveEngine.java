@@ -252,6 +252,58 @@ public class MoveEngine {
         return null; //No King...Should never happen
     }
 
+    public int numPieces(State state, Piece.Name name, Colour colour) {
+        int num = 0;
+        for (int i = 0; i < state.getState().length; i++) {
+            for (int j = 0; j < state.getState().length; j++) {
+                if (state.getPiece(i, j).getName() == name && state.getPiece(i,j).getColour() == colour)
+                    num++;
+            }
+        }
+        return num;
+    }
+
+    private int numTotalMoves(State state, Colour colour) {
+        //returns the number of total possible moves for that state of the board
+        int total = 0;
+        for (int i = 0; i < state.getState().length; i++) {
+            for (int j = 0; j < state.getState().length; j++) {
+                if (state.getPiece(i,j).getColour() == colour)
+                    total += getPossibleMoves(state.getPiece(i,j), state).size();
+            }
+        }
+        return total;
+    }
+    public double evaluateState(State state1, State state2, Colour colour) {
+        double evaluation = 0;
+        Colour oppositeColour = colour == Colour.WHITE ? Colour.BLACK : Colour.WHITE;
+
+        evaluation += 200 * (numPieces(state1, Piece.Name.KING, colour) - numPieces(state2, Piece.Name.KING, oppositeColour));
+        evaluation += 9 * (numPieces(state1, Piece.Name.QUEEN, colour) - numPieces(state2, Piece.Name.QUEEN, oppositeColour));
+        evaluation += 5 * (numPieces(state1, Piece.Name.ROOK, colour) - numPieces(state2, Piece.Name.ROOK, oppositeColour));
+        evaluation += 3 * (numPieces(state1, Piece.Name.BISHOP, colour) - numPieces(state2, Piece.Name.BISHOP, oppositeColour));
+        evaluation += 3 * (numPieces(state1, Piece.Name.KNIGHT, colour) - numPieces(state2, Piece.Name.KNIGHT, oppositeColour));
+        evaluation += numPieces(state1, Piece.Name.PAWN, colour) - numPieces(state2, Piece.Name.PAWN, oppositeColour);
+        evaluation += 0.1 * (numTotalMoves(state1, colour) - numTotalMoves(state2, oppositeColour));
+/*
+f(p) = 200(K-K')
++ 9(Q-Q')
++ 5(R-R')
++ 3(B-B' + N-N')
++ 1(P-P')
+- 0.5(D-D' + S-S' + I-I')
++ 0.1(M-M') + ...
+
+KQRBNP = number of kings, queens, rooks, bishops, knights and pawns
+D,S,I = doubled, blocked and isolated pawns
+M = Mobility (the number of legal moves)
+
+https://chessprogramming.wikispaces.com/Evaluation
+*/
+
+        return evaluation;
+    }
+
     private boolean canMove(Piece piece, Location toLocation, State state) {
         State tempstate = state.clone();
         Piece tempPiece = piece.clone();

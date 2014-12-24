@@ -92,6 +92,7 @@ public class HumanPlayer extends Player implements Runnable {
                             }
                         }
                     }
+                    clickFlag = false;
                 }
             }
         }

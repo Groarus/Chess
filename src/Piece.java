@@ -14,7 +14,6 @@ public abstract class Piece {
     private Colour colour;
     private Name name;
     private Status status;
-    private double value;
     private boolean selected, possibleMove, inCheck;
 
     public Piece(Name name, Colour colour) {

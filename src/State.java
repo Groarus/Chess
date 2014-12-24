@@ -7,8 +7,8 @@
 
 public class State {
 
-    private Piece[][] state;
     Player whitePlayer, blackPlayer;
+    private Piece[][] state;
 
     public State(Piece[][] state) {
         this.state = state;
@@ -41,7 +41,7 @@ public class State {
         return state[location.getX()][location.getY()];
     }
 
-    public void movePiece (Location startLocation, Location endLocation) {
+    public void movePiece(Location startLocation, Location endLocation) {
         int startX = startLocation.getX(), startY = startLocation.getY(), endX = endLocation.getX(), endY = endLocation.getY();
 
         state[endX][endY] = state[startX][startY]; //move the piece
