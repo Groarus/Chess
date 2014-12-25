@@ -253,15 +253,55 @@ public class MoveEngine {
         return null; //No King...Should never happen
     }
 
-    public int numPieces(State state, Piece.Name name, Colour colour) {
-        int num = 0;
-        for (int i = 0; i < state.getState().length; i++) {
-            for (int j = 0; j < state.getState().length; j++) {
-                if (state.getPiece(i, j).getName() == name && state.getPiece(i, j).getColour() == colour)
-                    num++;
+//    public int numPieces(State state, Piece.Name name, Colour colour) {
+//        int num = 0;
+//        for (int i = 0; i < state.getState().length; i++) {
+//            for (int j = 0; j < state.getState().length; j++) {
+//                if (state.getPiece(i, j).getName() == name && state.getPiece(i, j).getColour() == colour)
+//                    num++;
+//            }
+//        }
+//        return num;
+//    }
+
+    public int[][] numPieces(State state) {
+        int numPieces[][] = new int[2][6];
+      /*     [0][x] = white 
+      [1][x] = black 
+      [x][0] = pawn 
+      [x][1] = knight 
+      [x][2] = bishop 
+      [x][3] = rook 
+      [x][4] = queen 
+      [x][5] = king 
+      */
+        for (int i = 0; i < state.getState().length; i++){
+            for (int j = 0; j < state.getState().length; j++){
+                Piece temp = state.getPiece(i, j);
+                int colour = temp.getColour() == Colour.WHITE ? 0 : 1;
+                switch (temp.getName()) {
+                    case PAWN:
+                        numPieces[colour][0]++;
+                        break;
+                    case ROOK:
+                        numPieces[colour][1]++;
+                        break;
+                    case KNIGHT:
+                        numPieces[colour][2]++;
+                        break;
+                    case BISHOP:
+                        numPieces[colour][3]++;
+                        break;
+                    case QUEEN:
+                        numPieces[colour][4]++;
+                        break;
+                    case KING:
+                        numPieces[colour][5]++;
+                        break;
+                }
             }
         }
-        return num;
+        return numPieces;
     }
 
     private int numTotalMoves(State state, Colour colour) {
@@ -278,16 +318,21 @@ public class MoveEngine {
 
     public double evaluateState(State state1, State state2, Colour colour) {
         double evaluation = 0;
-        Colour oppositeColour = colour == Colour.WHITE ? Colour.BLACK : Colour.WHITE;
+        int colourInt = colour == Colour.WHITE ? 0 : 1;
+        int oppositeColourInt = colour == Colour.WHITE ? 1 : 0;
+
+        int numPieces1[][] = numPieces(state1);
+        int numPieces2[][] = numPieces(state2);
+
 
 //The difference in what we had plus the difference in what we have!
         //This can be cleaned up with variables
-        evaluation += 200 * ((numPieces(state2, Piece.Name.KING, colour) - numPieces(state2, Piece.Name.KING, oppositeColour)) - (numPieces(state1, Piece.Name.KING, colour) - numPieces(state1, Piece.Name.KING, oppositeColour)));
-        evaluation += 9 * ((numPieces(state2, Piece.Name.QUEEN, colour) - numPieces(state2, Piece.Name.QUEEN, oppositeColour)) - (numPieces(state1, Piece.Name.QUEEN, colour) - numPieces(state1, Piece.Name.QUEEN, oppositeColour)));
-        evaluation += 5 * ((numPieces(state2, Piece.Name.ROOK, colour) - numPieces(state2, Piece.Name.ROOK, oppositeColour)) - (numPieces(state1, Piece.Name.ROOK, colour) - numPieces(state1, Piece.Name.ROOK, oppositeColour)));
-        evaluation += 3 * ((numPieces(state2, Piece.Name.BISHOP, colour) - numPieces(state2, Piece.Name.BISHOP, oppositeColour)) - (numPieces(state1, Piece.Name.BISHOP, colour) - numPieces(state1, Piece.Name.BISHOP, oppositeColour)));
-        evaluation += 3 * ((numPieces(state2, Piece.Name.KNIGHT, colour) - numPieces(state2, Piece.Name.KNIGHT, oppositeColour)) - (numPieces(state1, Piece.Name.KNIGHT, colour) - numPieces(state1, Piece.Name.KNIGHT, oppositeColour)));
-        evaluation += (numPieces(state2, Piece.Name.PAWN, colour) - numPieces(state2, Piece.Name.PAWN, oppositeColour)) - (numPieces(state1, Piece.Name.PAWN, colour) - numPieces(state1, Piece.Name.PAWN, oppositeColour));
+        evaluation += 200 * ((numPieces2[colourInt][5] - numPieces2[oppositeColourInt][5]) - (numPieces1[colourInt][5] - numPieces1[oppositeColourInt][5]));
+        evaluation += 9 * ((numPieces2[colourInt][4] - numPieces2[oppositeColourInt][4]) - (numPieces1[colourInt][4] - numPieces1[oppositeColourInt][4]));
+        evaluation += 5 * ((numPieces2[colourInt][3] - numPieces2[oppositeColourInt][3]) - (numPieces1[colourInt][3] - numPieces1[oppositeColourInt][3]));
+        evaluation += 3 * ((numPieces2[colourInt][2] - numPieces2[oppositeColourInt][2]) - (numPieces1[colourInt][2] - numPieces1[oppositeColourInt][2]));
+        evaluation += 3 * ((numPieces2[colourInt][1] - numPieces2[oppositeColourInt][1]) - (numPieces1[colourInt][1] - numPieces1[oppositeColourInt][1]));
+        evaluation += (numPieces2[colourInt][0] - numPieces2[oppositeColourInt][0]) - (numPieces1[colourInt][0] - numPieces1[oppositeColourInt][0]);
 
 /*        evaluation += 200 * ((numPieces(state1, Piece.Name.KING, colour) - numPieces(state2, Piece.Name.KING, oppositeColour));
         evaluation += 9 * (numPieces(state1, Piece.Name.QUEEN, colour) - numPieces(state2, Piece.Name.QUEEN, oppositeColour));
