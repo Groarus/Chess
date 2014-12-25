@@ -40,6 +40,7 @@ public class ComputerPlayer extends Player implements Runnable {
         panel.add(computer, constraints);
     }
 
+
     private void selectAndMove() {
         //Method to select a piece and move piece.
 
@@ -50,7 +51,7 @@ public class ComputerPlayer extends Player implements Runnable {
         //tries all available moves and picks the one with the best evaluation score
         for (int i = 0; i < board.getState().length; i++) {
             for (int j = 0; j < board.getState().length; j++) {
-                if (board.getPiece(i,j).getColour() == getColour()) {
+                if (board.getPiece(i, j).getColour() == getColour()) {
                     Stack<Location> moves = moveEngine.getPossibleMoves(board.getPiece(i, j), board);
                     for (int k = 0; k < moves.size(); k++) {
                         State state = board.clone();
@@ -90,6 +91,44 @@ public class ComputerPlayer extends Player implements Runnable {
 //        }
 
     }
+
+
+ /*   private void selectAndMove() {
+    //Eric try. Might be better for when we deal with a tree...Dont delete
+        Location bestMoveStart = null;
+        Location bestMoveTo = null;
+        double bestMoveScore = Double.NEGATIVE_INFINITY;
+        Stack<State> allStates = new Stack<State>();
+        for (int i = 0; i < board.getState().length; i++) {
+            for (int j = 0; j < board.getState().length; j++) {
+                if (board.getPiece(i,j).getColour() == getColour()) {
+                    Stack<Location> moves = moveEngine.getPossibleMoves(board.getPiece(i, j), board);
+                    for (int k = 0; k < moves.size(); k++) {
+                        State state = board.clone();
+                        state.movePiece(new Location(i, j), moves.get(k));
+                        allStates.push(state);
+                    }
+                }
+            }
+        }
+        for (int i = 0; i < allStates.size(); i++) {
+            State checkState = allStates.pop();
+            double evaluation = moveEngine.evaluateState(checkState, board, Colour.BLACK);
+
+            if (evaluation > bestMoveScore) {
+                //Test
+                board.setState(checkState.getState());
+*//*                bestMoveStart = new Location(i, j);
+                bestMoveTo = moves.get(k);
+               *//*
+                bestMoveScore = evaluation;
+            }
+        }
+*//*        board.movePiece(bestMoveStart, bestMoveTo);
+        board.getPiece(bestMoveTo).setSelected(true);*//*
+        gui.repaint();
+        getTurn().next();
+    }*/
 
     public void run() {
         while (true) {

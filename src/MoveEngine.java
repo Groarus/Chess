@@ -1,3 +1,4 @@
+import java.util.Random;
 import java.util.Stack;
 
 /**
@@ -256,7 +257,7 @@ public class MoveEngine {
         int num = 0;
         for (int i = 0; i < state.getState().length; i++) {
             for (int j = 0; j < state.getState().length; j++) {
-                if (state.getPiece(i, j).getName() == name && state.getPiece(i,j).getColour() == colour)
+                if (state.getPiece(i, j).getName() == name && state.getPiece(i, j).getColour() == colour)
                     num++;
             }
         }
@@ -268,23 +269,39 @@ public class MoveEngine {
         int total = 0;
         for (int i = 0; i < state.getState().length; i++) {
             for (int j = 0; j < state.getState().length; j++) {
-                if (state.getPiece(i,j).getColour() == colour)
-                    total += getPossibleMoves(state.getPiece(i,j), state).size();
+                if (state.getPiece(i, j).getColour() == colour)
+                    total += getPossibleMoves(state.getPiece(i, j), state).size();
             }
         }
         return total;
     }
+
     public double evaluateState(State state1, State state2, Colour colour) {
         double evaluation = 0;
         Colour oppositeColour = colour == Colour.WHITE ? Colour.BLACK : Colour.WHITE;
 
-        evaluation += 200 * (numPieces(state1, Piece.Name.KING, colour) - numPieces(state2, Piece.Name.KING, oppositeColour));
+//The difference in what we had plus the difference in what we have!
+        //This can be cleaned up with variables
+        evaluation += 200 * ((numPieces(state2, Piece.Name.KING, colour) - numPieces(state2, Piece.Name.KING, oppositeColour)) - (numPieces(state1, Piece.Name.KING, colour) - numPieces(state1, Piece.Name.KING, oppositeColour)));
+        evaluation += 9 * ((numPieces(state2, Piece.Name.QUEEN, colour) - numPieces(state2, Piece.Name.QUEEN, oppositeColour)) - (numPieces(state1, Piece.Name.QUEEN, colour) - numPieces(state1, Piece.Name.QUEEN, oppositeColour)));
+        evaluation += 5 * ((numPieces(state2, Piece.Name.ROOK, colour) - numPieces(state2, Piece.Name.ROOK, oppositeColour)) - (numPieces(state1, Piece.Name.ROOK, colour) - numPieces(state1, Piece.Name.ROOK, oppositeColour)));
+        evaluation += 3 * ((numPieces(state2, Piece.Name.BISHOP, colour) - numPieces(state2, Piece.Name.BISHOP, oppositeColour)) - (numPieces(state1, Piece.Name.BISHOP, colour) - numPieces(state1, Piece.Name.BISHOP, oppositeColour)));
+        evaluation += 3 * ((numPieces(state2, Piece.Name.KNIGHT, colour) - numPieces(state2, Piece.Name.KNIGHT, oppositeColour)) - (numPieces(state1, Piece.Name.KNIGHT, colour) - numPieces(state1, Piece.Name.KNIGHT, oppositeColour)));
+        evaluation += (numPieces(state2, Piece.Name.PAWN, colour) - numPieces(state2, Piece.Name.PAWN, oppositeColour)) - (numPieces(state1, Piece.Name.PAWN, colour) - numPieces(state1, Piece.Name.PAWN, oppositeColour));
+
+/*        evaluation += 200 * ((numPieces(state1, Piece.Name.KING, colour) - numPieces(state2, Piece.Name.KING, oppositeColour));
         evaluation += 9 * (numPieces(state1, Piece.Name.QUEEN, colour) - numPieces(state2, Piece.Name.QUEEN, oppositeColour));
         evaluation += 5 * (numPieces(state1, Piece.Name.ROOK, colour) - numPieces(state2, Piece.Name.ROOK, oppositeColour));
         evaluation += 3 * (numPieces(state1, Piece.Name.BISHOP, colour) - numPieces(state2, Piece.Name.BISHOP, oppositeColour));
         evaluation += 3 * (numPieces(state1, Piece.Name.KNIGHT, colour) - numPieces(state2, Piece.Name.KNIGHT, oppositeColour));
-        evaluation += numPieces(state1, Piece.Name.PAWN, colour) - numPieces(state2, Piece.Name.PAWN, oppositeColour);
-        evaluation += 0.1 * (numTotalMoves(state1, colour) - numTotalMoves(state2, oppositeColour));
+        evaluation += numPieces(state1, Piece.Name.PAWN, colour) - numPieces(state2, Piece.Name.PAWN, oppositeColour);*/
+
+        if (evaluation == 0) {
+            evaluation = randomDouble(0, 1);
+        }
+        //evaluation += 0.1 * (numTotalMoves(state1, colour) - numTotalMoves(state2, oppositeColour));
+
+
 /*
 f(p) = 200(K-K')
 + 9(Q-Q')
@@ -301,7 +318,7 @@ M = Mobility (the number of legal moves)
 https://chessprogramming.wikispaces.com/Evaluation
 */
 
-        return evaluation;
+        return Math.abs(evaluation);
     }
 
     private boolean canMove(Piece piece, Location toLocation, State state) {
@@ -313,5 +330,11 @@ https://chessprogramming.wikispaces.com/Evaluation
         tempstate.movePiece(tempLocation, tempToLocation);
         tempPiece = tempstate.getPiece(tempToLocation);
         return !isInCheck(tempPiece, tempstate);
+    }
+
+    private double randomDouble(int min, double max) {
+        Random r = new Random();
+        return (min + (max - min) * r.nextDouble());
+
     }
 }
