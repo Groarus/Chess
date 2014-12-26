@@ -8,10 +8,11 @@ import java.util.Stack;
  */
 public class MoveEngine {
 
-//    private State state;
+    private MoveHistory moveHistory;
+    private Boolean enPassant = false;
 
-    public MoveEngine(State state) {
-//        this.state = state;
+    public MoveEngine(MoveHistory moveHistory) {
+        this.moveHistory = moveHistory;
     }
 
 
@@ -36,8 +37,19 @@ public class MoveEngine {
 
 
     public boolean move(Piece piece, Location toLocation, State state) {
+        enPassant = false;
         if (validateMove(piece, toLocation, state) && canMove(piece, toLocation, state)) {
             boolean overtaken = false;
+
+            if (enPassant) {
+                if (state.getPiece(toLocation.getX(), toLocation.getY()+1).getName() == Piece.Name.PAWN)
+                    state.setPiece(toLocation.getX(), toLocation.getY()+1, new Empty(Piece.Name.EMPTY, Colour.NEUTRAL));
+                else if (state.getPiece(toLocation.getX(), toLocation.getY()-1).getName() == Piece.Name.PAWN)
+                    state.setPiece(toLocation.getX(), toLocation.getY()-1, new Empty(Piece.Name.EMPTY, Colour.NEUTRAL));
+                overtaken = true;
+            }
+
+
             if (state.getPiece(toLocation).getColour() != Colour.NEUTRAL && state.getPiece(toLocation).getColour() != piece.getColour())
                 overtaken = true;
 
@@ -58,6 +70,7 @@ public class MoveEngine {
         return false;
     }
 
+
     private boolean pawnCheck(Piece piece, Location toLocation, State state) {
         Piece endPiece = state.getPiece(toLocation.getX(), toLocation.getY());
         int xDif = Math.abs(piece.getLocation().getX() - toLocation.getX());
@@ -77,11 +90,22 @@ public class MoveEngine {
         if (yDif <= maxSpaces & ((piece.getColour() == Colour.BLACK & piece.getLocation().getY() > toLocation.getY()) | (piece.getColour() == Colour.WHITE & piece.getLocation().getY() < toLocation.getY()))) {
             if (piece.getLocation().getX() == toLocation.getX() & endPiece.getName() == Piece.Name.EMPTY) {
                 return true;
-            } else
-                return endPiece.getName() != Piece.Name.EMPTY && endPiece.getColour() != piece.getColour() && xDif == 1 && yDif == 1; //Pawn Capture
-        } else {
+            } else if (endPiece.getName() != Piece.Name.EMPTY && endPiece.getColour() != piece.getColour() && xDif == 1 && yDif == 1) {
+                return true; //Pawn Capture
+            } else {
+                //EN PASSANT//
+                Piece lastPiece = state.getPiece(moveHistory.lastMove());
+                if (piece.getPrevLocation() != null && lastPiece.getPrevLocation() != null)
+                    if (Math.abs(lastPiece.getPrevLocation().getY() - lastPiece.getLocation().getY()) == 2 && lastPiece.getName() == Piece.Name.PAWN) // if the last move was a 2 jump and was a pawn
+                        if (toLocation.getX() == lastPiece.getLocation().getX() && (Math.abs(toLocation.getY() - lastPiece.getLocation().getY()) == 1 && (Math.abs(toLocation.getY() - lastPiece.getPrevLocation().getY()) == 1))) {
+                            enPassant = true;
+                            return true;
+                        }
+                return false;
+            }
+        } else
             return false;
-        }
+
     }
 
     private boolean knightCheck(Piece piece, Location toLocation, State state) {
@@ -326,20 +350,12 @@ public class MoveEngine {
 
 
 //The difference in what we had plus the difference in what we have!
-        //This can be cleaned up with variables
         evaluation += 200 * ((numPieces2[colourInt][5] - numPieces2[oppositeColourInt][5]) - (numPieces1[colourInt][5] - numPieces1[oppositeColourInt][5]));
         evaluation += 9 * ((numPieces2[colourInt][4] - numPieces2[oppositeColourInt][4]) - (numPieces1[colourInt][4] - numPieces1[oppositeColourInt][4]));
         evaluation += 5 * ((numPieces2[colourInt][3] - numPieces2[oppositeColourInt][3]) - (numPieces1[colourInt][3] - numPieces1[oppositeColourInt][3]));
         evaluation += 3 * ((numPieces2[colourInt][2] - numPieces2[oppositeColourInt][2]) - (numPieces1[colourInt][2] - numPieces1[oppositeColourInt][2]));
         evaluation += 3 * ((numPieces2[colourInt][1] - numPieces2[oppositeColourInt][1]) - (numPieces1[colourInt][1] - numPieces1[oppositeColourInt][1]));
         evaluation += (numPieces2[colourInt][0] - numPieces2[oppositeColourInt][0]) - (numPieces1[colourInt][0] - numPieces1[oppositeColourInt][0]);
-
-/*        evaluation += 200 * ((numPieces(state1, Piece.Name.KING, colour) - numPieces(state2, Piece.Name.KING, oppositeColour));
-        evaluation += 9 * (numPieces(state1, Piece.Name.QUEEN, colour) - numPieces(state2, Piece.Name.QUEEN, oppositeColour));
-        evaluation += 5 * (numPieces(state1, Piece.Name.ROOK, colour) - numPieces(state2, Piece.Name.ROOK, oppositeColour));
-        evaluation += 3 * (numPieces(state1, Piece.Name.BISHOP, colour) - numPieces(state2, Piece.Name.BISHOP, oppositeColour));
-        evaluation += 3 * (numPieces(state1, Piece.Name.KNIGHT, colour) - numPieces(state2, Piece.Name.KNIGHT, oppositeColour));
-        evaluation += numPieces(state1, Piece.Name.PAWN, colour) - numPieces(state2, Piece.Name.PAWN, oppositeColour);*/
 
         if (evaluation == 0) {
             evaluation = randomDouble(0, 1);

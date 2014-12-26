@@ -13,10 +13,20 @@ public class MoveHistory {
     Queue<String> moves = new LinkedList<String>();
     private Player player1, player2;
     private String mode;
+    private String lastMove = null;
 
     public void addMove(Colour colour, Location fromLocation, Location toLocation) {
         String moveString = colour.name() + "\t" + fromLocation.getX() + "\t" + fromLocation.getY() + "\t" + toLocation.getX() + "\t" + toLocation.getY() + "\n";
+        lastMove = moveString;
         moves.add(moveString);
+    }
+
+    public Location  lastMove () {
+        if (lastMove != null) {
+            String[] last = lastMove.split("\t");
+            return new Location(Integer.parseInt(last[3]), Integer.parseInt(last[4].split("\n")[0]));
+        }
+        return new Location(0,0);
     }
 
     public Queue<String> getMoves() {

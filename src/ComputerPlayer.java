@@ -1,5 +1,4 @@
 import javax.swing.*;
-import javax.swing.text.html.BlockView;
 import java.awt.*;
 import java.util.Stack;
 
@@ -19,7 +18,7 @@ public class ComputerPlayer extends Player implements Runnable {
     public ComputerPlayer(Colour colour, Board board, GUI gui, Turn turn, MoveHistory moveHistory) {
         super(colour, board, gui, turn, moveHistory);
         //set up the GUI
-        this.move = new MoveEngine(board);
+        this.move = new MoveEngine(moveHistory);
         infoPanel();
         gui.addSidePanel(panel);
     }
@@ -68,7 +67,9 @@ public class ComputerPlayer extends Player implements Runnable {
             }
         }
         board.movePiece(bestMoveOrig, bestMove);
+        moveHistory.addMove(getColour(),bestMoveOrig,bestMove);
         board.getPiece(bestMove).setSelected(true);
+        moveEngine.highlightCheck(board);
         gui.repaint();
         getTurn().next();
 

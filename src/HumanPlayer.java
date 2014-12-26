@@ -21,7 +21,7 @@ public class HumanPlayer extends Player implements Runnable {
 
     public HumanPlayer(Colour colour, Board board, GUI gui, Turn turn, MoveHistory moveHistory) {
         super(colour, board, gui, turn, moveHistory);
-        this.move = new MoveEngine(board);
+        this.move = new MoveEngine(moveHistory);
         this.board = board;
         //set up the gui
         infoPanel();

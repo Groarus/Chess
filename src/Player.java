@@ -25,7 +25,7 @@ public class Player {
         this.piecesLeftValue = new JLabel(Integer.toString(piecesLeft));
         this.numMovesValue = new JLabel(Integer.toString(numMoves));
         this.moveHistory = moveHistory;
-        this.moveEngine = new MoveEngine(board);
+        this.moveEngine = new MoveEngine(moveHistory);
     }
 
     public Colour getColour() {
