@@ -90,7 +90,7 @@ public class MoveEngine {
          */
         if (yDif <= maxSpaces & ((piece.getColour() == Colour.BLACK & piece.getLocation().getY() > toLocation.getY()) | (piece.getColour() == Colour.WHITE & piece.getLocation().getY() < toLocation.getY()))) {
             if (piece.getLocation().getX() == toLocation.getX() & endPiece.getName() == Piece.Name.EMPTY) {
-                if ((piece.getColour() == Colour.BLACK && state.getPiece(toLocation.getX(), 5).getName() == Piece.Name.EMPTY) || (piece.getColour() == Colour.WHITE && state.getPiece(toLocation.getX(), 2).getName() == Piece.Name.EMPTY)) {
+                if ((piece.getColour() == Colour.BLACK && state.getPiece(toLocation.getX(), piece.getLocation().getY() - 1).getName() == Piece.Name.EMPTY) || (piece.getColour() == Colour.WHITE && state.getPiece(toLocation.getX(), piece.getLocation().getY() + 1).getName() == Piece.Name.EMPTY)) {
                     //Piece Promotion
                     if (toLocation.getY() == 0 || toLocation.getY() == 7)
                         special = specialMove.PROMOTE;
