@@ -51,7 +51,18 @@ public class Board extends State {
         //empty places
         for (int j = 2; j < 6; j++) {
             for (int i = 0; i < 8; i++) {
-                this.setPiece(i, j, new Empty(Piece.Name.EMPTY, Colour.NEUTRAL));
+                this.setPiece(i, j, new Empty());
+            }
+        }
+    }
+
+    public void resetHighlight() {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                Piece temp = getPiece(i, j);
+                temp.setPossibleMove(false);
+                temp.setSelected(false);
+                temp.setInCheck(false);
             }
         }
     }

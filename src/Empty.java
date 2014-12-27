@@ -5,7 +5,7 @@
  */
 public class Empty extends Piece {
 
-    public Empty(Name name, Colour colour) {
-        super(name, colour);
+    public Empty() {
+        super(Name.EMPTY, Colour.NEUTRAL);
     }
 }

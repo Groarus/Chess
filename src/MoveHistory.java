@@ -21,12 +21,12 @@ public class MoveHistory {
         moves.add(moveString);
     }
 
-    public Location  lastMove () {
+    public Location lastMove() {
         if (lastMove != null) {
             String[] last = lastMove.split("\t");
             return new Location(Integer.parseInt(last[3]), Integer.parseInt(last[4].split("\n")[0]));
         }
-        return new Location(0,0);
+        return new Location(0, 0);
     }
 
     public Queue<String> getMoves() {

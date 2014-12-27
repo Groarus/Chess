@@ -11,8 +11,9 @@ import java.util.Stack;
 public class ComputerPlayer extends Player implements Runnable {
     int row = 0; //Test variables
     int column = 6;
-    private Piece selected = new Empty(Piece.Name.EMPTY, Colour.NEUTRAL);
+    private Piece selected = new Empty();
     private MoveEngine move;
+    private Boolean runBool = true;
 
 
     public ComputerPlayer(Colour colour, Board board, GUI gui, Turn turn, MoveHistory moveHistory) {
@@ -41,56 +42,39 @@ public class ComputerPlayer extends Player implements Runnable {
 
 
     private void selectAndMove() {
-        //Method to select a piece and move piece.
-
-        Location bestMoveOrig = null;
-        Location bestMove = null;
-        double bestMoveScore = Double.NEGATIVE_INFINITY;
+        State bestState = null;
+        double bestStateScore = Double.NEGATIVE_INFINITY;
 
         //tries all available moves and picks the one with the best evaluation score
         for (int i = 0; i < board.getState().length; i++) {
             for (int j = 0; j < board.getState().length; j++) {
                 if (board.getPiece(i, j).getColour() == getColour()) {
-                    Stack<Location> moves = moveEngine.getPossibleMoves(board.getPiece(i, j), board);
-                    for (int k = 0; k < moves.size(); k++) {
-                        State state = board.clone();
-                        state.movePiece(new Location(i, j), moves.get(k));
-                        double evaluation = moveEngine.evaluateState(state, board, Colour.BLACK);
-
-                        if (evaluation > bestMoveScore) {
-                            bestMoveOrig = new Location(i, j);
-                            bestMove = moves.get(k);
-                            bestMoveScore = evaluation;
+                    Stack<State> stateStack = moveEngine.getPossibleStates(board.getPiece(i, j), board); //get possible states
+                    for (State s : stateStack) {
+                        double evaluation = moveEngine.evaluateState(s, board, getColour());
+                        if (evaluation > bestStateScore) {
+                            bestState = s;
+                            bestStateScore = evaluation;
                         }
                     }
                 }
             }
         }
-        board.movePiece(bestMoveOrig, bestMove);
-        moveHistory.addMove(getColour(),bestMoveOrig,bestMove);
-        board.getPiece(bestMove).setSelected(true);
-        moveEngine.highlightCheck(board);
-        gui.repaint();
-        getTurn().next();
+        if (bestState != null) {
+            board.setState(bestState.getState()); //Set the new board state
 
 
-//
-//
-//        selected = board.getPiece(row, column);
-//        selected.setLocation(new Location(row, column)); //setting the location of the piece as it is not set prior
-//        selected.setSelected(true);
-//
-//
-//        if (selected.getName() != Piece.Name.EMPTY) {
-//            column--;
-//            if (move.move(selected, new Location(row, column), board)) { //MAIN MOVEMENT OF PLAYER
-//
-//                getTurn().next();
-//            }
-//            gui.repaint(); //refreshes the board
-//            selected = new Empty(Piece.Name.EMPTY, Colour.NEUTRAL); //unselect it
-//        }
-
+            board.setLastMoveStart(bestState.getLastMoveStart());
+            board.setLastMoveEnd(bestState.getLastMoveEnd());
+            moveHistory.addMove(getColour(), board.getLastMoveStart(), board.getLastMoveEnd()); //history
+            board.getPiece(board.getLastMoveEnd()).setSelected(true); //select the newly moved piece
+            moveEngine.highlightCheck(board); //in check checker
+            gui.repaint();
+            getTurn().next();
+        } else {
+            System.out.println("Checkmate");
+            runBool = false;
+        }
     }
 
 
@@ -132,7 +116,12 @@ public class ComputerPlayer extends Player implements Runnable {
     }*/
 
     public void run() {
-        while (true) {
+        while (runBool) {
+            try {
+                Thread.sleep(250);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             if (getTurn().getTurn() == getColour()) {
                 selectAndMove();
             }

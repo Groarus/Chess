@@ -140,7 +140,7 @@ public abstract class Piece {
             }
             return b;
         } else {
-            Empty e = new Empty(Name.EMPTY, Colour.NEUTRAL);
+            Empty e = new Empty();
             if (!(this.getLocation() == null)) {
                 e.setLocation(new Location(this.getLocation().getX(), this.getLocation().getY()));
             }

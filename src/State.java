@@ -9,13 +9,26 @@ public class State {
 
     Player whitePlayer, blackPlayer;
     private Piece[][] state;
-
-    public State(Piece[][] state) {
-        this.state = state;
-    }
+    private Location lastMoveStart, lastMoveEnd;
 
     public State() {
         this.state = new Piece[8][8];
+    }
+
+    public Location getLastMoveStart() {
+        return lastMoveStart;
+    }
+
+    public void setLastMoveStart(Location lastMoveStart) {
+        this.lastMoveStart = lastMoveStart;
+    }
+
+    public Location getLastMoveEnd() {
+        return lastMoveEnd;
+    }
+
+    public void setLastMoveEnd(Location lastMoveEnd) {
+        this.lastMoveEnd = lastMoveEnd;
     }
 
     public Piece[][] getState() {
@@ -45,9 +58,12 @@ public class State {
         try {
             int startX = startLocation.getX(), startY = startLocation.getY(), endX = endLocation.getX(), endY = endLocation.getY();
             state[endX][endY] = state[startX][startY]; //move the piece
-            state[startX][startY] = new Empty(Piece.Name.EMPTY, Colour.NEUTRAL); //old location to empty piece
+            state[startX][startY] = new Empty(); //old location to empty piece
             state[endX][endY].setLocation(endLocation);
             state[endX][endY].setPrevLocation(startLocation);
+            lastMoveStart = startLocation;
+
+            lastMoveEnd = endLocation;
         } catch (NullPointerException e) {
             System.out.print("More than likely, Checkmate"); //Not quite 100% this is always the case
         }
