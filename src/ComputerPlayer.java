@@ -1,6 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
-import java.util.Stack;
+import java.util.*;
 
 
 /**
@@ -40,30 +40,48 @@ public class ComputerPlayer extends Player implements Runnable {
         panel.add(computer, constraints);
     }
 
-
-    private void selectAndMove() {
+    private State getBestMove(int depth) {
         State bestState = null;
         double bestStateScore = Double.NEGATIVE_INFINITY;
+        Node moves = new Node(null, board, 0);
+        Queue<Node> fringe = new LinkedList<Node>();
+        fringe.add(moves);
 
+        // moves.addChild(new Node(board, moveEngine.evaluateState(board, board, getColour())));
         //tries all available moves and picks the one with the best evaluation score
-        for (int i = 0; i < board.getState().length; i++) {
-            for (int j = 0; j < board.getState().length; j++) {
-                if (board.getPiece(i, j).getColour() == getColour()) {
-                    Stack<State> stateStack = moveEngine.getPossibleStates(board.getPiece(i, j), board); //get possible states
-                    for (State s : stateStack) {
-                        double evaluation = moveEngine.evaluateState(s, board, getColour());
-                        if (evaluation > bestStateScore) {
-                            bestState = s;
-                            bestStateScore = evaluation;
+        while (fringe.size() > 0) {
+            Node temp = fringe.poll();
+            for (int i = 0; i < board.getState().length; i++) {
+                for (int j = 0; j < board.getState().length; j++) {
+                    if (temp.getState().getPiece(i, j).getColour() == getColour()) {
+                        Stack<State> stateStack = moveEngine.getPossibleStates(temp.getState().getPiece(i, j), temp.getState()); //get possible states
+                        for (State s : stateStack) {
+                            double evaluation = moveEngine.evaluateState(s, temp.getState(), getColour());
+                            Node child = new Node(temp, s, evaluation);
+                            temp.addChild(child);
+                            if (temp.getDepth() < depth - 1) {
+                                fringe.add(child);
+                            }
+                            if (evaluation > bestStateScore) {
+                                Node tempParent = child;
+                                while ((tempParent.getDepth() > 1)) {
+                                    tempParent = tempParent.getParent();
+                                }
+                                bestState = tempParent.getState(); //Goes up the tree to the parent that produced the best child.
+                                bestStateScore = evaluation;
+                            }
                         }
                     }
                 }
             }
-        }
+        } //while loop
+        return bestState;
+    }
+
+    private void selectAndMove() {
+        State bestState = getBestMove(3);
         if (bestState != null) {
             board.setState(bestState.getState()); //Set the new board state
-
-
             board.setLastMoveStart(bestState.getLastMoveStart());
             board.setLastMoveEnd(bestState.getLastMoveEnd());
             moveHistory.addMove(getColour(), board.getLastMoveStart(), board.getLastMoveEnd()); //history
