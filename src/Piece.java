@@ -13,13 +13,11 @@ public abstract class Piece {
     private Location location, prevLocation = null;
     private Colour colour;
     private Name name;
-    private Status status;
     private boolean selected, possibleMove, inCheck;
 
     public Piece(Name name, Colour colour) {
         this.colour = colour;
         this.name = name;
-        this.status = Status.ALIVE;
     }
 
     public Location getLocation() {
@@ -42,10 +40,6 @@ public abstract class Piece {
 
     public Name getName() {
         return name;
-    }
-
-    public Status getStatus() {
-        return status;
     }
 
     public BufferedImage getImage() {
@@ -84,10 +78,11 @@ public abstract class Piece {
         this.inCheck = inCheck;
     }
 
+    @Override
     public Piece clone() {
         if (this.getName() == Name.PAWN) {
             Pawn p = new Pawn(this.getColour());
-            p.setLocation(new Location(this.getLocation().getX(), this.getLocation().getY()));
+            p.setLocation(this.getLocation().clone());
             if (!(this.getPrevLocation() == null)) {
                 p.setPrevLocation(new Location(this.getPrevLocation().getX(), this.getPrevLocation().getY()));
             } else {
@@ -96,7 +91,7 @@ public abstract class Piece {
             return p;
         } else if (this.getName() == Name.KING) {
             King k = new King(this.getColour());
-            k.setLocation(new Location(this.getLocation().getX(), this.getLocation().getY()));
+            k.setLocation(this.getLocation().clone());
             if (!(this.getPrevLocation() == null)) {
                 k.setPrevLocation(new Location(this.getPrevLocation().getX(), this.getPrevLocation().getY()));
             } else {
@@ -105,7 +100,7 @@ public abstract class Piece {
             return k;
         } else if (this.getName() == Name.KNIGHT) {
             Knight knight = new Knight(this.getColour());
-            knight.setLocation(new Location(this.getLocation().getX(), this.getLocation().getY()));
+            knight.setLocation(this.getLocation().clone());
             if (!(this.getPrevLocation() == null)) {
                 knight.setPrevLocation(new Location(this.getPrevLocation().getX(), this.getPrevLocation().getY()));
             } else {
@@ -114,7 +109,7 @@ public abstract class Piece {
             return knight;
         } else if (this.getName() == Name.QUEEN) {
             Queen q = new Queen(this.getColour());
-            q.setLocation(new Location(this.getLocation().getX(), this.getLocation().getY()));
+            q.setLocation(this.getLocation().clone());
             if (!(this.getPrevLocation() == null)) {
                 q.setPrevLocation(new Location(this.getPrevLocation().getX(), this.getPrevLocation().getY()));
             } else {
@@ -123,7 +118,7 @@ public abstract class Piece {
             return q;
         } else if (this.getName() == Name.ROOK) {
             Rook r = new Rook(this.getColour());
-            r.setLocation(new Location(this.getLocation().getX(), this.getLocation().getY()));
+            r.setLocation(this.getLocation().clone());
             if (!(this.getPrevLocation() == null)) {
                 r.setPrevLocation(new Location(this.getPrevLocation().getX(), this.getPrevLocation().getY()));
             } else {
@@ -132,7 +127,7 @@ public abstract class Piece {
             return r;
         } else if (this.getName() == Name.BISHOP) {
             Bishop b = new Bishop(this.getColour());
-            b.setLocation(new Location(this.getLocation().getX(), this.getLocation().getY()));
+            b.setLocation(this.getLocation().clone());
             if (!(this.getPrevLocation() == null)) {
                 b.setPrevLocation(new Location(this.getPrevLocation().getX(), this.getPrevLocation().getY()));
             } else {
@@ -142,7 +137,7 @@ public abstract class Piece {
         } else {
             Empty e = new Empty();
             if (!(this.getLocation() == null)) {
-                e.setLocation(new Location(this.getLocation().getX(), this.getLocation().getY()));
+                e.setLocation(this.getLocation().clone());
             }
             if (!(this.getPrevLocation() == null)) {
                 e.setPrevLocation(new Location(this.getPrevLocation().getX(), this.getPrevLocation().getY()));
@@ -152,10 +147,75 @@ public abstract class Piece {
             return e;
         }
     }
-
-    enum Status {
-        ALIVE, DEAD;
-    }
+//    @Override
+//    public Piece clone() {
+//        if (this.getName() == Name.PAWN) {
+//            Pawn p = new Pawn(this.getColour());
+//            p.setLocation(new Location(this.getLocation().getX(), this.getLocation().getY()));
+//            if (!(this.getPrevLocation() == null)) {
+//                p.setPrevLocation(new Location(this.getPrevLocation().getX(), this.getPrevLocation().getY()));
+//            } else {
+//                p.setPrevLocation(null);
+//            }
+//            return p;
+//        } else if (this.getName() == Name.KING) {
+//            King k = new King(this.getColour());
+//            k.setLocation(new Location(this.getLocation().getX(), this.getLocation().getY()));
+//            if (!(this.getPrevLocation() == null)) {
+//                k.setPrevLocation(new Location(this.getPrevLocation().getX(), this.getPrevLocation().getY()));
+//            } else {
+//                k.setPrevLocation(null);
+//            }
+//            return k;
+//        } else if (this.getName() == Name.KNIGHT) {
+//            Knight knight = new Knight(this.getColour());
+//            knight.setLocation(new Location(this.getLocation().getX(), this.getLocation().getY()));
+//            if (!(this.getPrevLocation() == null)) {
+//                knight.setPrevLocation(new Location(this.getPrevLocation().getX(), this.getPrevLocation().getY()));
+//            } else {
+//                knight.setPrevLocation(null);
+//            }
+//            return knight;
+//        } else if (this.getName() == Name.QUEEN) {
+//            Queen q = new Queen(this.getColour());
+//            q.setLocation(new Location(this.getLocation().getX(), this.getLocation().getY()));
+//            if (!(this.getPrevLocation() == null)) {
+//                q.setPrevLocation(new Location(this.getPrevLocation().getX(), this.getPrevLocation().getY()));
+//            } else {
+//                q.setPrevLocation(null);
+//            }
+//            return q;
+//        } else if (this.getName() == Name.ROOK) {
+//            Rook r = new Rook(this.getColour());
+//            r.setLocation(new Location(this.getLocation().getX(), this.getLocation().getY()));
+//            if (!(this.getPrevLocation() == null)) {
+//                r.setPrevLocation(new Location(this.getPrevLocation().getX(), this.getPrevLocation().getY()));
+//            } else {
+//                r.setPrevLocation(null);
+//            }
+//            return r;
+//        } else if (this.getName() == Name.BISHOP) {
+//            Bishop b = new Bishop(this.getColour());
+//            b.setLocation(new Location(this.getLocation().getX(), this.getLocation().getY()));
+//            if (!(this.getPrevLocation() == null)) {
+//                b.setPrevLocation(new Location(this.getPrevLocation().getX(), this.getPrevLocation().getY()));
+//            } else {
+//                b.setPrevLocation(null);
+//            }
+//            return b;
+//        } else {
+//            Empty e = new Empty();
+//            if (!(this.getLocation() == null)) {
+//                e.setLocation(new Location(this.getLocation().getX(), this.getLocation().getY()));
+//            }
+//            if (!(this.getPrevLocation() == null)) {
+//                e.setPrevLocation(new Location(this.getPrevLocation().getX(), this.getPrevLocation().getY()));
+//            } else {
+//                e.setPrevLocation(null);
+//            }
+//            return e;
+//        }
+//    }
 
     enum Name {
         BISHOP, KING, KNIGHT, PAWN, QUEEN, ROOK, EMPTY;

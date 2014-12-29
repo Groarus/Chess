@@ -6,7 +6,6 @@
 
 
 public class Board extends State {
-    private GUI gui;
 
     public Board(GUI gui) {
         if (!(gui == null)) {
@@ -14,7 +13,6 @@ public class Board extends State {
             //set up the GUI
             PaintBoard paintBoard = new PaintBoard(this);
             gui.addBoardPanel(paintBoard);
-            this.gui = gui;
         }
     }
 
@@ -54,6 +52,8 @@ public class Board extends State {
                 this.setPiece(i, j, new Empty());
             }
         }
+
+        setStatePieces();
     }
 
     public void resetHighlight() {

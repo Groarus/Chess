@@ -10,9 +10,28 @@ public class State {
     Player whitePlayer, blackPlayer;
     private Piece[][] state;
     private Location lastMoveStart, lastMoveEnd;
+    private StatePieces whitePieces, blackPieces;
 
     public State() {
         this.state = new Piece[8][8];
+        this.whitePieces = new StatePieces();
+        this.blackPieces = new StatePieces();
+    }
+
+    public StatePieces getWhitePieces() {
+        return whitePieces;
+    }
+
+    public void setWhitePieces(StatePieces whitePieces) {
+        this.whitePieces = whitePieces;
+    }
+
+    public StatePieces getBlackPieces() {
+        return blackPieces;
+    }
+
+    public void setBlackPieces(StatePieces blackPieces) {
+        this.blackPieces = blackPieces;
     }
 
     public Location getLastMoveStart() {
@@ -41,9 +60,7 @@ public class State {
 
     public void setPiece(int x, int y, Piece piece) {
         state[x][y] = piece;
-        if (!(piece.getName() == Piece.Name.EMPTY)) {
-            state[x][y].setLocation(new Location(x, y));
-        }
+        piece.setLocation(new Location(x, y));
     }
 
     public Piece getPiece(int x, int y) {
@@ -56,14 +73,25 @@ public class State {
 
     public void movePiece(Location startLocation, Location endLocation) {
         try {
+            //Overtaking a piece
+            if (getPiece(endLocation).getColour() != getPiece(startLocation).getColour() && getPiece(endLocation).getColour() != Colour.NEUTRAL) {
+                //to remove getPiece(endLocation)
+                if (getPiece(endLocation).getColour() == Colour.WHITE)
+                    getWhitePieces().removePiece(getPiece(endLocation));
+                else
+                    getBlackPieces().removePiece(getPiece(endLocation));
+
+            }
+
             int startX = startLocation.getX(), startY = startLocation.getY(), endX = endLocation.getX(), endY = endLocation.getY();
             state[endX][endY] = state[startX][startY]; //move the piece
             state[startX][startY] = new Empty(); //old location to empty piece
+            state[startX][startY].setLocation(new Location(startX, startY));
             state[endX][endY].setLocation(endLocation);
             state[endX][endY].setPrevLocation(startLocation);
             lastMoveStart = startLocation;
-
             lastMoveEnd = endLocation;
+
         } catch (NullPointerException e) {
             System.out.print("More than likely, Checkmate"); //Not quite 100% this is always the case
         }
@@ -83,6 +111,36 @@ public class State {
 
     public void setBlackPlayer(Player blackPlayer) {
         this.blackPlayer = blackPlayer;
+    }
+
+
+    public void setStatePieces() {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                Piece tempPiece = state[i][j];
+                StatePieces tempPieces = tempPiece.getColour() == Colour.WHITE ? getWhitePieces() : getBlackPieces();
+                switch (tempPiece.getName()) {
+                    case KING:
+                        tempPieces.addKing(tempPiece);
+                        break;
+                    case QUEEN:
+                        tempPieces.addQueen(tempPiece);
+                        break;
+                    case ROOK:
+                        tempPieces.addRook(tempPiece);
+                        break;
+                    case BISHOP:
+                        tempPieces.addBishop(tempPiece);
+                        break;
+                    case KNIGHT:
+                        tempPieces.addKnight(tempPiece);
+                        break;
+                    case PAWN:
+                        tempPieces.addPawn(tempPiece);
+                        break;
+                }
+            }
+        }
     }
 
     public void displayBoard() {
@@ -119,8 +177,11 @@ public class State {
         }
         State tempState = new State();
         tempState.setState(temp);
-        setWhitePlayer(this.whitePlayer);
-        setBlackPlayer(this.blackPlayer);
+        tempState.setWhitePlayer(this.whitePlayer);
+        tempState.setBlackPlayer(this.blackPlayer);
+        tempState.setLastMoveStart(getLastMoveStart().clone());
+        tempState.setLastMoveEnd(getLastMoveEnd().clone());
+        tempState.setStatePieces();
         return tempState;
     }
 }

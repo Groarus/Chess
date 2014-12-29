@@ -1,6 +1,8 @@
 import javax.swing.*;
 import java.awt.*;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Stack;
 
 
 /**
@@ -51,37 +53,95 @@ public class ComputerPlayer extends Player implements Runnable {
         //tries all available moves and picks the one with the best evaluation score
         while (fringe.size() > 0) {
             Node temp = fringe.poll();
-            for (int i = 0; i < board.getState().length; i++) {
-                for (int j = 0; j < board.getState().length; j++) {
-                    if (temp.getState().getPiece(i, j).getColour() == getColour()) {
-                        Stack<State> stateStack = moveEngine.getPossibleStates(temp.getState().getPiece(i, j), temp.getState()); //get possible states
-                        for (State s : stateStack) {
-                            double evaluation = moveEngine.evaluateState(s, temp.getState(), getColour());
-                            Node child = new Node(temp, s, evaluation);
-                            temp.addChild(child);
-                            if (temp.getDepth() < depth - 1) {
-                                fringe.add(child);
-                            }
-                            if (evaluation > bestStateScore) {
-                                Node tempParent = child;
-                                while ((tempParent.getDepth() > 1)) {
-                                    tempParent = tempParent.getParent();
-                                }
-                                bestState = tempParent.getState(); //Goes up the tree to the parent that produced the best child.
-                                bestStateScore = evaluation;
-                            }
+            for (Piece piece : temp.getState().getBlackPieces().getAll()) {
+                Stack<State> stateStack = moveEngine.getPossibleStates(piece, temp.getState()); //get possible states
+                for (State s : stateStack) {
+                    double evaluation = moveEngine.evaluateState(s, temp.getState(), getColour());
+                    Node child = new Node(temp, s, evaluation);
+                    temp.addChild(child);
+                    if (temp.getDepth() < depth - 1) {
+                        fringe.add(child);
+                    }
+                    if (evaluation > bestStateScore) {
+                        Node tempParent = child;
+                        while ((tempParent.getDepth() > 1)) {
+                            tempParent = tempParent.getParent();
                         }
+                        bestState = tempParent.getState(); //Goes up the tree to the parent that produced the best child.
+                        bestStateScore = evaluation;
                     }
                 }
+
             }
         } //while loop
         return bestState;
     }
 
+    private void grahamBestMove() {
+        Location bestStart = null, bestEnd = null;
+
+        double bestStateScore = Double.NEGATIVE_INFINITY;
+        State temp = board.clone();
+
+        /*
+        This is 1 ply. I changed it so it no longer works with states, I pretty much removed all cloning
+        from the program except once (above). Cloning is what was slowing things down so much.
+        Also added StatePieces, state.getWhite or getBlack pieces .getAll returns all the white/black pieces.
+        This allows us to use a simple for each loop instead of a nested loop.
+        So what I do is move the piece, evaluate the state. Then move is back. But of course all parameters need to
+        be put back to how they were before. Thus the 5 lines that move the piece.
+         */
+        for (Piece piece : temp.getBlackPieces().getAll()) {
+            Stack<Location> moves = moveEngine.getPossibleMoves(piece, temp);
+
+            for (Location move : moves) {
+                //Move the piece
+                Location startLocation = piece.getLocation();
+                Location prevLocation = piece.getPrevLocation();
+                Piece tempPiece = temp.getPiece(move);
+                Location lastMoveStart = temp.getLastMoveStart();
+                Location lastMoveEnd = temp.getLastMoveEnd();
+                temp.movePiece(startLocation, move);
+
+                //Evaluate the State
+                double evaluation = moveEngine.evaluateState(board, temp, getColour());
+
+                if (evaluation > bestStateScore) {
+                    bestStart = startLocation;
+                    bestEnd = move;
+                    bestStateScore = evaluation;
+                }
+
+                //Move the piece back
+                if (tempPiece.getName() != Piece.Name.EMPTY && tempPiece.getColour() == Colour.WHITE)
+                    temp.getWhitePieces().addPiece(tempPiece);
+                else if (tempPiece.getName() != Piece.Name.EMPTY && tempPiece.getColour() == Colour.BLACK)
+                    temp.getBlackPieces().addPiece(tempPiece);
+
+                temp.movePiece(move, startLocation);
+                temp.setPiece(move.getX(), move.getY(), tempPiece);
+                temp.setLastMoveStart(lastMoveStart);
+                temp.setLastMoveEnd(lastMoveEnd);
+                piece.setPrevLocation(prevLocation);
+            }
+
+        }
+
+        board.movePiece(bestStart, bestEnd);
+        moveHistory.addMove(getColour(), board.getLastMoveStart(), board.getLastMoveEnd()); //history
+        board.getPiece(board.getLastMoveEnd()).setSelected(true); //select the newly moved piece
+        moveEngine.highlightCheck(board); //in check checker
+        gui.repaint();
+        getTurn().next();
+    }
+
+
+
     private void selectAndMove() {
-        State bestState = getBestMove(3);
+        State bestState = getBestMove(2);
+//        State bestState = grahamBestMove();
         if (bestState != null) {
-            board.setState(bestState.getState()); //Set the new board state
+            board.movePiece(bestState.getLastMoveStart(), bestState.getLastMoveEnd());
             board.setLastMoveStart(bestState.getLastMoveStart());
             board.setLastMoveEnd(bestState.getLastMoveEnd());
             moveHistory.addMove(getColour(), board.getLastMoveStart(), board.getLastMoveEnd()); //history
@@ -141,7 +201,8 @@ public class ComputerPlayer extends Player implements Runnable {
                 e.printStackTrace();
             }
             if (getTurn().getTurn() == getColour()) {
-                selectAndMove();
+//                selectAndMove();
+                grahamBestMove();
             }
         }
 

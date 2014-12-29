@@ -63,8 +63,9 @@ public class MoveEngine {
             //increment number of moves and decrement pieces left if overtaken == true
             if (piece.getColour() == Colour.WHITE) {
                 state.getWhitePlayer().incrementMoves();
-                if (overtaken)
+                if (overtaken) {
                     state.getBlackPlayer().decPiecesLeft();
+                }
             } else {
                 state.getBlackPlayer().incrementMoves();
                 if (overtaken)
@@ -224,6 +225,7 @@ public class MoveEngine {
 
     }
 
+
     private boolean kingCheck(Piece piece, Location toLocation, State state) {
         Piece endPiece = state.getPiece(toLocation.getX(), toLocation.getY());
         int xDif = Math.abs(piece.getLocation().getX() - toLocation.getX());
@@ -294,140 +296,89 @@ public class MoveEngine {
 
     public void highlightCheck(State state) {
         //Checks if either king is in check and highlights its location if true//
-        Piece tempKing = state.getPiece(getKingLocation(Colour.BLACK, state));
-        if (isInCheck(tempKing, state))
+        Piece tempKing = state.getWhitePieces().getKing().peek();
+        if (isInCheck(Colour.WHITE, state))
             tempKing.setInCheck(true);
-        tempKing = state.getPiece(getKingLocation(Colour.WHITE, state));
-        if (isInCheck(tempKing, state))
+        tempKing = state.getBlackPieces().getKing().peek();
+        if (isInCheck(Colour.BLACK, state))
             tempKing.setInCheck(true);
     }
 
-    private boolean isInCheck(Piece piece, State state) {
-        Location kingLocation = getKingLocation(piece.getColour(), state);
-        for (int i = 0; i < state.getState().length; i++) {
-            for (int j = 0; j < state.getState().length; j++) {
-                if (!(state.getPiece(i, j).getName() == Piece.Name.EMPTY) && state.getPiece(i, j).getColour() != piece.getColour() && validateMove(state.getPiece(i, j), kingLocation, state)) {
-                    return true;
-                }
+    private boolean isInCheck(Colour colour, State state) {
+        Location kingLocation = colour == Colour.WHITE ? state.getWhitePieces().getKing().peek().getLocation() : state.getBlackPieces().getKing().peek().getLocation();
+        StatePieces oppositePieces = colour == Colour.WHITE ? state.getBlackPieces() : state.getWhitePieces();
+
+        for (Piece piece : oppositePieces.getAll()) {
+            if (validateMove(piece, kingLocation, state)) {
+                return true;
             }
         }
         return false;
     }
 
-
-    private Location getKingLocation(Colour colour, State state) {
-        for (int i = 0; i < state.getState().length; i++) {
-            for (int j = 0; j < state.getState().length; j++) {
-                if (!(state.getPiece(i, j).getName() == Piece.Name.EMPTY) && state.getPiece(i, j).getColour() == colour && state.getPiece(i, j).getName() == Piece.Name.KING) {
-                    return state.getPiece(i, j).getLocation();
-                }
-            }
-        }
-        return null; //No King...Should never happen
-    }
-
-
-    public int[][] numPieces(State state) {
-        int numPieces[][] = new int[2][6];
-      /*     [0][x] = white 
-      [1][x] = black 
-      [x][0] = pawn 
-      [x][1] = knight 
-      [x][2] = bishop 
-      [x][3] = rook 
-      [x][4] = queen 
-      [x][5] = king 
-      */
-        for (int i = 0; i < state.getState().length; i++) {
-            for (int j = 0; j < state.getState().length; j++) {
-                Piece temp = state.getPiece(i, j);
-                int colour = temp.getColour() == Colour.WHITE ? 0 : 1;
-                switch (temp.getName()) {
-                    case PAWN:
-                        numPieces[colour][0]++;
-                        break;
-                    case ROOK:
-                        numPieces[colour][1]++;
-                        break;
-                    case KNIGHT:
-                        numPieces[colour][2]++;
-                        break;
-                    case BISHOP:
-                        numPieces[colour][3]++;
-                        break;
-                    case QUEEN:
-                        numPieces[colour][4]++;
-                        break;
-                    case KING:
-                        numPieces[colour][5]++;
-                        break;
-                }
-            }
-        }
-        return numPieces;
-    }
-
-    private int numTotalMoves(State state, Colour colour) {
-        //returns the number of total possible moves for that state of the board
-        int total = 0;
-        for (int i = 0; i < state.getState().length; i++) {
-            for (int j = 0; j < state.getState().length; j++) {
-                if (state.getPiece(i, j).getColour() == colour)
-                    total += getPossibleMoves(state.getPiece(i, j), state).size();
-            }
-        }
-        return total;
-    }
-
     public double evaluateState(State state1, State state2, Colour colour) {
         double evaluation = 0;
-        int colourInt = colour == Colour.WHITE ? 0 : 1;
-        int oppositeColourInt = colour == Colour.WHITE ? 1 : 0;
 
-        int numPieces1[][] = numPieces(state1);
-        int numPieces2[][] = numPieces(state2);
-
+        StatePieces colour1 = colour == Colour.WHITE ? state1.getWhitePieces() : state1.getBlackPieces();
+        StatePieces opposite1 = colour == Colour.WHITE ? state1.getBlackPieces() : state1.getWhitePieces();
+        StatePieces colour2 = colour == Colour.WHITE ? state2.getWhitePieces() : state2.getBlackPieces();
+        StatePieces opposite2 = colour == Colour.WHITE ? state2.getBlackPieces() : state2.getWhitePieces();
 
 //The difference in what we had plus the difference in what we have!
-        evaluation += 200 * ((numPieces2[colourInt][5] - numPieces2[oppositeColourInt][5]) - (numPieces1[colourInt][5] - numPieces1[oppositeColourInt][5]));
-        evaluation += 9 * ((numPieces2[colourInt][4] - numPieces2[oppositeColourInt][4]) - (numPieces1[colourInt][4] - numPieces1[oppositeColourInt][4]));
-        evaluation += 5 * ((numPieces2[colourInt][3] - numPieces2[oppositeColourInt][3]) - (numPieces1[colourInt][3] - numPieces1[oppositeColourInt][3]));
-        evaluation += 3 * ((numPieces2[colourInt][2] - numPieces2[oppositeColourInt][2]) - (numPieces1[colourInt][2] - numPieces1[oppositeColourInt][2]));
-        evaluation += 3 * ((numPieces2[colourInt][1] - numPieces2[oppositeColourInt][1]) - (numPieces1[colourInt][1] - numPieces1[oppositeColourInt][1]));
-        evaluation += (numPieces2[colourInt][0] - numPieces2[oppositeColourInt][0]) - (numPieces1[colourInt][0] - numPieces1[oppositeColourInt][0]);
+
+        //                  state2  colour                  state2 opposite                     start1 colour               state1 opposite
+        evaluation += 200 * ((colour2.getKing().size() - opposite2.getKing().size()) - (colour1.getKing().size() - opposite1.getKing().size()));
+        evaluation += 9 * ((colour2.getQueens().size() - opposite2.getQueens().size()) - (colour1.getQueens().size() - opposite1.getQueens().size()));
+        evaluation += 5 * ((colour2.getRooks().size() - opposite2.getRooks().size()) - (colour1.getRooks().size() - opposite1.getRooks().size()));
+        evaluation += 3 * ((colour2.getBishops().size() - opposite2.getBishops().size()) - (colour1.getBishops().size() - opposite1.getBishops().size()));
+        evaluation += 3 * ((colour2.getKnights().size() - opposite2.getKnights().size()) - (colour1.getKnights().size() - opposite1.getKnights().size()));
+        evaluation += (colour2.getPawns().size() - opposite2.getPawns().size()) - (colour1.getPawns().size() - opposite1.getPawns().size());
 
         if (evaluation == 0) {
             evaluation = randomDouble(0, 1);
         }
 
-/*
-f(p) = 200(K-K')
-+ 9(Q-Q')
-+ 5(R-R')
-+ 3(B-B' + N-N')
-+ 1(P-P')
-- 0.5(D-D' + S-S' + I-I')
-+ 0.1(M-M') + ...
-
-KQRBNP = number of kings, queens, rooks, bishops, knights and pawns
-D,S,I = doubled, blocked and isolated pawns
-M = Mobility (the number of legal moves)
-
-https://chessprogramming.wikispaces.com/Evaluation
-*/
+        //https://chessprogramming.wikispaces.com/Evaluation
 
         return Math.abs(evaluation);
     }
 
     private boolean canMove(Piece piece, Location toLocation, State state) {
-        State tempstate = state.clone();
-        Piece tempPiece = piece.clone();
-        Location tempLocation, tempToLocation;
-        tempLocation = new Location(tempPiece.getLocation().getX(), tempPiece.getLocation().getY());
-        tempToLocation = new Location(toLocation.getX(), toLocation.getY());
-        tempstate.movePiece(tempLocation, tempToLocation);
-        tempPiece = tempstate.getPiece(tempToLocation);
-        return !isInCheck(tempPiece, tempstate);
+//        State tempstate = state.clone();
+//        Piece tempPiece = piece.clone();
+//        Location tempLocation, tempToLocation;
+//        tempLocation = new Location(tempPiece.getLocation().getX(), tempPiece.getLocation().getY());
+//        tempToLocation = new Location(toLocation.getX(), toLocation.getY());
+//        tempstate.movePiece(tempLocation, tempToLocation);
+//        tempPiece = tempstate.getPiece(tempToLocation);
+//         return (!(isInCheck(tempPiece.getColour(),tempstate)));
+        Boolean ret;
+
+        Location startLocation = piece.getLocation();
+        Location prevLocation = piece.getPrevLocation();
+        Piece tempPiece = state.getPiece(toLocation);
+        Location lastMoveStart = state.getLastMoveStart();
+        Location lastMoveEnd = state.getLastMoveEnd();
+
+        state.movePiece(startLocation, toLocation);
+
+        if (isInCheck(piece.getColour(), state))
+            ret = false;
+        else
+            ret = true;
+
+        if (tempPiece.getName() != Piece.Name.EMPTY && tempPiece.getColour() == Colour.WHITE)
+            state.getWhitePieces().addPiece(tempPiece);
+        else if (tempPiece.getName() != Piece.Name.EMPTY && tempPiece.getColour() == Colour.BLACK)
+            state.getBlackPieces().addPiece(tempPiece);
+
+        state.movePiece(toLocation, startLocation);
+        state.setPiece(toLocation.getX(), toLocation.getY(), tempPiece);
+        state.setLastMoveStart(lastMoveStart);
+        state.setLastMoveEnd(lastMoveEnd);
+        piece.setPrevLocation(prevLocation);
+
+        return ret;
     }
 
     private double randomDouble(int min, double max) {
