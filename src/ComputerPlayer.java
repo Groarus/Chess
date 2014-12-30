@@ -55,7 +55,6 @@ public class ComputerPlayer extends Player implements Runnable {
         Location result[] = new Location[2];
         Location bestStart = null, bestEnd = null;
         double bestEvaluation = Double.NEGATIVE_INFINITY;
-        Node bestNode = null;
         Node root = new Node(null, board);//rootNode
         Queue<Node> fringe = new LinkedList<Node>();
         fringe.add(root);
@@ -92,7 +91,6 @@ public class ComputerPlayer extends Player implements Runnable {
                             while ((tempParent.getDepth() > 1)) {
                                 tempParent = tempParent.getParent();
                             }
-                            bestNode = tempParent; //Goes up the tree to the parent that produced the best child.
                             bestEvaluation = evaluation;
                             bestStart = startLocation;
                             bestEnd = move;
@@ -122,7 +120,6 @@ public class ComputerPlayer extends Player implements Runnable {
         //Get the best start and end locations
         Location bestLocations[] = ericBestMove(3);
         board.movePiece(bestLocations[0], bestLocations[1]);
-
         moveHistory.addMove(getColour(), board.getLastMoveStart(), board.getLastMoveEnd()); //history
         board.getPiece(board.getLastMoveEnd()).setSelected(true); //select the newly moved piece
         moveEngine.highlightCheck(board); //in check checker
