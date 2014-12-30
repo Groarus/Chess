@@ -16,7 +16,7 @@ public class ComputerPlayer extends Player implements Runnable {
     private Piece selected = new Empty();
     private MoveEngine move;
     private Boolean runBool = true;
-
+    private Node root;
 
     public ComputerPlayer(Colour colour, Board board, GUI gui, Turn turn, MoveHistory moveHistory) {
         super(colour, board, gui, turn, moveHistory);
@@ -24,6 +24,7 @@ public class ComputerPlayer extends Player implements Runnable {
         this.move = new MoveEngine(moveHistory);
         infoPanel();
         gui.addSidePanel(panel);
+        //root = new Node(null, board);
     }
 
     private void infoPanel() {
@@ -44,6 +45,8 @@ public class ComputerPlayer extends Player implements Runnable {
 
 
     private Location[] ericBestMove(int depth) {
+        //For minimax, root is always max and then it alternates, (even depth = max)(odd depth = min)
+        //if ( x & 1 == 0 ) { even... } else { odd... }
                 /*
         This is 1 ply. I changed it so it no longer works with states, I pretty much removed all cloning
         from the program except once (above). Cloning is what was slowing things down so much.
@@ -53,17 +56,27 @@ public class ComputerPlayer extends Player implements Runnable {
         be put back to how they were before. Thus the 5 lines that move the piece.
          */
         Location result[] = new Location[2];
-        Location bestStart = null, bestEnd = null;
-        double bestEvaluation = Double.NEGATIVE_INFINITY;
         Node root = new Node(null, board);//rootNode
         Queue<Node> fringe = new LinkedList<Node>();
+        Stack<Node> parents = new Stack<Node>();
         fringe.add(root);
+        parents.push(root);
+        Colour evaluationColour = null;
 
         while (fringe.size() > 0) {
             Node tempNode = fringe.poll();
             State temp = tempNode.getState().clone();
-
-            for (Piece piece : temp.getBlackPieces().getAll()) {
+            StatePieces pieces = null;
+            if (tempNode.getMax()) {
+                //If its a max move, its children will be cpu moves
+                pieces = temp.getBlackPieces();
+                evaluationColour = Colour.WHITE;
+            } else if (tempNode.getMin()) {
+                //If its a min move, its children will be player moves
+                pieces = temp.getWhitePieces();
+                evaluationColour = Colour.BLACK;
+            }
+            for (Piece piece : pieces.getAll()) {
                 Stack<Location> moves = moveEngine.getPossibleMoves(piece, temp);
 
                 for (Location move : moves) {
@@ -82,19 +95,13 @@ public class ComputerPlayer extends Player implements Runnable {
 
                     if (tempNode.getDepth() < depth - 1) {
                         fringe.add(child);
+                        parents.push(child);
                     } else {
-                        //Evaluate child node when at the highest depth
-                        double evaluation = moveEngine.evaluateState(tempNode.getState(), temp, getColour());
+                        //Evaluate child node when at the deepest depth
+                        double evaluation = moveEngine.evaluateState(tempNode.getState(), tempNode.getState(), evaluationColour);
                         child.setEvaluation(evaluation);
-                        if (evaluation > bestEvaluation) {
-                            Node tempParent = child;
-                            while ((tempParent.getDepth() > 1)) {
-                                tempParent = tempParent.getParent();
-                            }
-                            bestEvaluation = evaluation;
-                            bestStart = startLocation;
-                            bestEnd = move;
-                        }
+                        child.setStartLocation(startLocation);
+                        child.setEndLocation(move);
                     }
                     //Move the piece back
                     if (tempPiece.getName() != Piece.Name.EMPTY && tempPiece.getColour() == Colour.WHITE)
@@ -110,15 +117,27 @@ public class ComputerPlayer extends Player implements Runnable {
                 }
             }
         }
-        result[0] = bestStart;
-        result[1] = bestEnd;
-        // bestNode.getState().movePiece(bestStart, bestEnd); //Move the best piece to its spot
+        //Tree is made and we have all the parents on a stack to go back up to the root.
+        while (!parents.isEmpty()) {
+            if (parents.peek().getMax()) {
+                parents.pop().maximize();
+            } else if (parents.peek().getMin()) {
+                parents.pop().maximize();
+            }
+        }
+        result[0] = root.getBestChild().getStartLocation();
+        result[1] = root.getBestChild().getEndLocation();
+        System.out.println(root.getMax());
+        System.out.println(root.getEvaluation());
+        for (int i = 0; i < root.getChildren().size(); i++) {
+            System.out.println("Child: " + i + " " + root.getChildren().get(i).getEvaluation());
+        }
         return result;
     }
 
     private void ericSelectAndMove() {
         //Get the best start and end locations
-        Location bestLocations[] = ericBestMove(3);
+        Location bestLocations[] = ericBestMove(1);
         board.movePiece(bestLocations[0], bestLocations[1]);
         moveHistory.addMove(getColour(), board.getLastMoveStart(), board.getLastMoveEnd()); //history
         board.getPiece(board.getLastMoveEnd()).setSelected(true); //select the newly moved piece

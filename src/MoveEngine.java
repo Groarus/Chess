@@ -317,17 +317,16 @@ public class MoveEngine {
     }
 
     public double evaluateState(State state1, State state2, Colour colour) {
-        double evaluation = 0;
 
-        StatePieces colour1 = colour == Colour.WHITE ? state1.getWhitePieces() : state1.getBlackPieces();
+/*        StatePieces colour1 = colour == Colour.WHITE ? state1.getWhitePieces() : state1.getBlackPieces();
         StatePieces opposite1 = colour == Colour.WHITE ? state1.getBlackPieces() : state1.getWhitePieces();
         StatePieces colour2 = colour == Colour.WHITE ? state2.getWhitePieces() : state2.getBlackPieces();
-        StatePieces opposite2 = colour == Colour.WHITE ? state2.getBlackPieces() : state2.getWhitePieces();
+        StatePieces opposite2 = colour == Colour.WHITE ? state2.getBlackPieces() : state2.getWhitePieces();*/
 
 //The difference in what we had plus the difference in what we have!
 
         //                  state2  colour                  state2 opposite                     start1 colour               state1 opposite
-        evaluation += 200 * ((colour2.getKing().size() - opposite2.getKing().size()) - (colour1.getKing().size() - opposite1.getKing().size()));
+/*        evaluation += 200 * ((colour2.getKing().size() - opposite2.getKing().size()) - (colour1.getKing().size() - opposite1.getKing().size()));
         evaluation += 9 * ((colour2.getQueens().size() - opposite2.getQueens().size()) - (colour1.getQueens().size() - opposite1.getQueens().size()));
         evaluation += 5 * ((colour2.getRooks().size() - opposite2.getRooks().size()) - (colour1.getRooks().size() - opposite1.getRooks().size()));
         evaluation += 3 * ((colour2.getBishops().size() - opposite2.getBishops().size()) - (colour1.getBishops().size() - opposite1.getBishops().size()));
@@ -336,11 +335,34 @@ public class MoveEngine {
 
         if (evaluation == 0) {
             evaluation = randomDouble(0, 1);
-        }
+        }*/
+        double evaluation ;
+        double whiteEval = 0;
+        double blackEval = 0;
 
+        StatePieces whitePieces = state2.getWhitePieces();
+        StatePieces  blackPieces = state2.getBlackPieces();
+
+        whiteEval += 200 * (whitePieces.getKing().size());
+        whiteEval += 9 * (whitePieces.getQueens().size());
+        whiteEval += 5 * (whitePieces.getRooks().size());
+        whiteEval += 3 * (whitePieces.getBishops().size());
+        whiteEval += 3 * (whitePieces.getKnights().size());
+        whiteEval += 1 * (whitePieces.getPawns().size());
+
+        blackEval += 200 * (blackPieces.getKing().size());
+        blackEval += 9 * (blackPieces.getQueens().size());
+        blackEval += 5 * (blackPieces.getRooks().size());
+        blackEval += 3 * (blackPieces.getBishops().size());
+        blackEval += 3 * (blackPieces.getKnights().size());
+        blackEval += 1 * (blackPieces.getPawns().size());
+
+        evaluation = blackEval-whiteEval;
         //https://chessprogramming.wikispaces.com/Evaluation
-
-        return Math.abs(evaluation);
+        if (evaluation == 0) {
+            evaluation = randomDouble(0, 1);
+        }
+        return (evaluation);
     }
 
     private boolean canMove(Piece piece, Location toLocation, State state) {

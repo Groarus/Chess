@@ -9,21 +9,31 @@ public class Node {
     private State state;
     private Node parent;
     private double evaluation;
-    private double min;
-    private double max;
+    private boolean min;
+    private boolean max;
     private int depth;
     private Location startLocation;
     private Location endLocation;
+    private Node bestChild = null; //used to store the child that gave the min or max value
 
     public Node(Node parent, State state) {
-        this.state = state;
+       this.state = state;
         this.parent = parent;
         // this.evaluation = evaluation;
         children = new ArrayList<Node>();
         if (parent == null) {
             depth = 0;
+/*            if (state.getBlackPlayer() instanceof ComputerPlayer) {
+                min = true;
+                max = false;
+            } else {*/
+            max = true;
+            min = false;
+//            }
         } else {
             depth = parent.getDepth() + 1;
+            min = !parent.getMin();
+            max = !parent.getMax();
         }
     }
 
@@ -35,19 +45,19 @@ public class Node {
         return children;
     }
 
-    public double getMin() {
+    public boolean getMin() {
         return min;
     }
 
-    public void setMin(double min) {
+    public void setMin(boolean min) {
         this.min = min;
     }
 
-    public double getMax() {
+    public boolean getMax() {
         return max;
     }
 
-    public void setMax(double max) {
+    public void setMax(boolean max) {
         this.max = max;
     }
 
@@ -58,6 +68,8 @@ public class Node {
     public State getState() {
         return state;
     }
+
+    public void setState(State state){this.state = state;};
 
     public Node getParent() {
         return parent;
@@ -89,5 +101,37 @@ public class Node {
 
     public Location getEndLocation() {
         return endLocation;
+    }
+
+    public void minimize() {
+        double bestEvaluation = Double.POSITIVE_INFINITY;
+        for (int i = 0; i < children.size(); i++) {
+            double childEval = children.get(i).getEvaluation();
+            if (childEval < bestEvaluation) {
+                bestEvaluation = childEval;
+                bestChild = children.get(i);
+                evaluation = bestEvaluation;
+                startLocation = children.get(i).getStartLocation();
+                endLocation = children.get(i).getEndLocation();
+            }
+        }
+    }
+
+    public void maximize() {
+        double bestEvaluation = Double.NEGATIVE_INFINITY;
+        for (int i = 0; i < children.size(); i++) {
+            double childEval = children.get(i).getEvaluation();
+            if (childEval > bestEvaluation) {
+                bestEvaluation = childEval;
+                bestChild = children.get(i);
+                evaluation = bestEvaluation;
+                startLocation = children.get(i).getStartLocation();
+                endLocation = children.get(i).getEndLocation();
+            }
+        }
+    }
+
+    public Node getBestChild() {
+        return bestChild;
     }
 }
