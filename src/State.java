@@ -18,21 +18,19 @@ public class State {
         this.blackPieces = new StatePieces();
     }
 
+    public StatePieces getPieces (Colour colour) {
+        return colour == Colour.WHITE ? getWhitePieces() : getBlackPieces();
+    }
+
     public StatePieces getWhitePieces() {
         return whitePieces;
     }
 
-    public void setWhitePieces(StatePieces whitePieces) {
-        this.whitePieces = whitePieces;
-    }
 
     public StatePieces getBlackPieces() {
         return blackPieces;
     }
 
-    public void setBlackPieces(StatePieces blackPieces) {
-        this.blackPieces = blackPieces;
-    }
 
     public Location getLastMoveStart() {
         return lastMoveStart;
@@ -48,10 +46,6 @@ public class State {
 
     public void setLastMoveEnd(Location lastMoveEnd) {
         this.lastMoveEnd = lastMoveEnd;
-    }
-
-    public Piece[][] getState() {
-        return state;
     }
 
     public void setState(Piece[][] state) {

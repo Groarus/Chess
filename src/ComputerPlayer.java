@@ -1,3 +1,5 @@
+import javafx.util.Pair;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.LinkedList;
@@ -168,56 +170,26 @@ public class ComputerPlayer extends Player implements Runnable {
     private void grahamBestMove() {
         Location bestStart = null, bestEnd = null;
 
-        double bestStateScore = Double.NEGATIVE_INFINITY;
+        double bestScore = Double.NEGATIVE_INFINITY;
         State temp = board.clone();
-
-        /*
-        This is 1 ply. I changed it so it no longer works with states, I pretty much removed all cloning
-        from the program except once (above). Cloning is what was slowing things down so much.
-        Also added StatePieces, state.getWhite or getBlack pieces .getAll returns all the white/black pieces.
-        This allows us to use a simple for each loop instead of a nested loop.
-        So what I do is move the piece, evaluate the state. Then move is back. But of course all parameters need to
-        be put back to how they were before. Thus the 5 lines that move the piece.
-         */
-
-        for (Piece piece : temp.getBlackPieces().getAll()) {
-            Stack<Location> moves = moveEngine.getPossibleMoves(piece, temp);
-
-            for (Location move : moves) {
-                //Move the piece
-                Location startLocation = piece.getLocation();
-                Location prevLocation = piece.getPrevLocation();
-                Piece tempPiece = temp.getPiece(move);
-                Location lastMoveStart = temp.getLastMoveStart();
-                Location lastMoveEnd = temp.getLastMoveEnd();
-                temp.movePiece(startLocation, move);
-
-                //Evaluate the State
-                double evaluation = moveEngine.evaluateState(board, temp, getColour());
-
-                if (evaluation > bestStateScore) {
-                    bestStart = startLocation;
-                    bestEnd = move;
-                    bestStateScore = evaluation;
-                }
-
-                //Move the piece back
-                if (tempPiece.getName() != Piece.Name.EMPTY && tempPiece.getColour() == Colour.WHITE)
-                    temp.getWhitePieces().addPiece(tempPiece);
-                else if (tempPiece.getName() != Piece.Name.EMPTY && tempPiece.getColour() == Colour.BLACK)
-                    temp.getBlackPieces().addPiece(tempPiece);
-
-                temp.movePiece(move, startLocation);
-                temp.setPiece(move.getX(), move.getY(), tempPiece);
-                temp.setLastMoveStart(lastMoveStart);
-                temp.setLastMoveEnd(lastMoveEnd);
-                piece.setPrevLocation(prevLocation);
+        for (Piece piece : temp.getPieces(getColour()).getAll()) {
+            Pair<Location, Double> results = moveEngine.getBestMove(piece, temp, board);
+            if (results.getValue() > bestScore) {
+                bestStart = piece.getLocation();
+                bestEnd = results.getKey();
+                bestScore = results.getValue();
             }
-
         }
+//        board.movePiece(bestStart, bestEnd);
+        moveEngine.move(board.getPiece(bestStart), bestEnd, board);
 
-
+        moveHistory.addMove(getColour(), board.getLastMoveStart(), board.getLastMoveEnd());//history 
+        board.getPiece(board.getLastMoveEnd()).setSelected(true); //select the newly moved piece 
+        moveEngine.highlightCheck(board); //in check checker 
+        gui.repaint();
+        getTurn().next();
     }
+
 
     private State getBestMove(int depth) {
      /*   State bestState = null;
@@ -264,7 +236,7 @@ public class ComputerPlayer extends Player implements Runnable {
             }
             if (getTurn().getTurn() == getColour()) {
                 ericSelectAndMove();
-                // grahamBestMove();
+//                grahamBestMove();
             }
         }
 
