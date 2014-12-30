@@ -12,11 +12,13 @@ public class Node {
     private double min;
     private double max;
     private int depth;
+    private Location startLocation;
+    private Location endLocation;
 
-    public Node(Node parent, State state, double evaluation) {
+    public Node(Node parent, State state) {
         this.state = state;
         this.parent = parent;
-        this.evaluation = evaluation;
+        // this.evaluation = evaluation;
         children = new ArrayList<Node>();
         if (parent == null) {
             depth = 0;
@@ -61,7 +63,31 @@ public class Node {
         return parent;
     }
 
+    public double getEvaluation() {
+        return evaluation;
+    }
+
+    public void setEvaluation(double evaluation) {
+        this.evaluation = evaluation;
+    }
+
     public int getDepth() {
         return depth;
+    }
+
+    public void setStartLocation(Location startLocation) {
+        this.startLocation = startLocation;
+    }
+
+    public void setEndLocation(Location endLocation) {
+        this.endLocation = endLocation;
+    }
+
+    public Location getStartLocation() {
+        return startLocation;
+    }
+
+    public Location getEndLocation() {
+        return endLocation;
     }
 }
