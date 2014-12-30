@@ -43,7 +43,7 @@ public class ComputerPlayer extends Player implements Runnable {
     }
 
 
-    private State ericBestMove(int depth) {
+    private Location[] ericBestMove(int depth) {
                 /*
         This is 1 ply. I changed it so it no longer works with states, I pretty much removed all cloning
         from the program except once (above). Cloning is what was slowing things down so much.
@@ -52,7 +52,7 @@ public class ComputerPlayer extends Player implements Runnable {
         So what I do is move the piece, evaluate the state. Then move is back. But of course all parameters need to
         be put back to how they were before. Thus the 5 lines that move the piece.
          */
-
+        Location result[] = new Location[2];
         Location bestStart = null, bestEnd = null;
         double bestEvaluation = Double.NEGATIVE_INFINITY;
         Node bestNode = null;
@@ -112,14 +112,16 @@ public class ComputerPlayer extends Player implements Runnable {
                 }
             }
         }
-        bestNode.getState().movePiece(bestStart, bestEnd); //Move the best piece to its spot
-        return bestNode.getState();
+        result[0] = bestStart;
+        result[1] = bestEnd;
+        // bestNode.getState().movePiece(bestStart, bestEnd); //Move the best piece to its spot
+        return result;
     }
 
     private void ericSelectAndMove() {
         //Get the best start and end locations
-        State bestState = ericBestMove(3);
-        board.setState(bestState.getState());
+        Location bestLocations[] = ericBestMove(3);
+        board.movePiece(bestLocations[0], bestLocations[1]);
 
         moveHistory.addMove(getColour(), board.getLastMoveStart(), board.getLastMoveEnd()); //history
         board.getPiece(board.getLastMoveEnd()).setSelected(true); //select the newly moved piece
