@@ -15,7 +15,7 @@ public class TempMove {
         this.state = state;
     }
 
-    public void move (Location toLocation) {
+    public void move(Location toLocation) {
         this.toLocation = toLocation;
         this.startLocation = piece.getLocation();
         this.prevLocation = piece.getPrevLocation();
@@ -25,7 +25,7 @@ public class TempMove {
         state.movePiece(startLocation, toLocation);
     }
 
-    public void undoMove () {
+    public void undoMove() {
         if (toPiece.getName() != Piece.Name.EMPTY && toPiece.getColour() == Colour.WHITE)
             state.getWhitePieces().addPiece(toPiece);
         else if (toPiece.getName() != Piece.Name.EMPTY && toPiece.getColour() == Colour.BLACK)

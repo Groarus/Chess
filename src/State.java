@@ -18,7 +18,7 @@ public class State {
         this.blackPieces = new StatePieces();
     }
 
-    public StatePieces getPieces (Colour colour) {
+    public StatePieces getPieces(Colour colour) {
         return colour == Colour.WHITE ? getWhitePieces() : getBlackPieces();
     }
 

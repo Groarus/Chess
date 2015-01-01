@@ -17,7 +17,7 @@ public class Node {
     private Node bestChild = null; //used to store the child that gave the min or max value
 
     public Node(Node parent, State state) {
-       this.state = state;
+        this.state = state;
         this.parent = parent;
         // this.evaluation = evaluation;
         children = new ArrayList<Node>();
@@ -69,7 +69,11 @@ public class Node {
         return state;
     }
 
-    public void setState(State state){this.state = state;};
+    public void setState(State state) {
+        this.state = state;
+    }
+
+    ;
 
     public Node getParent() {
         return parent;
@@ -87,20 +91,20 @@ public class Node {
         return depth;
     }
 
-    public void setStartLocation(Location startLocation) {
-        this.startLocation = startLocation;
-    }
-
-    public void setEndLocation(Location endLocation) {
-        this.endLocation = endLocation;
-    }
-
     public Location getStartLocation() {
         return startLocation;
     }
 
+    public void setStartLocation(Location startLocation) {
+        this.startLocation = startLocation;
+    }
+
     public Location getEndLocation() {
         return endLocation;
+    }
+
+    public void setEndLocation(Location endLocation) {
+        this.endLocation = endLocation;
     }
 
     public void minimize() {

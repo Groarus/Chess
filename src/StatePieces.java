@@ -33,7 +33,7 @@ public class StatePieces {
     public void removePiece(Piece piece) {
         switch (piece.getName()) {
             case KING:
-                System.out.println("CHECK MATE StatePieces");
+                King.remove(piece);
                 break;
             case QUEEN:
                 Queen.remove(piece);

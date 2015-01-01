@@ -1,5 +1,3 @@
-import javafx.util.Pair;
-
 import javax.swing.*;
 import java.awt.*;
 import java.util.LinkedList;
@@ -19,11 +17,13 @@ public class ComputerPlayer extends Player implements Runnable {
     private MoveEngine move;
     private Boolean runBool = true;
     private Node root;
+    private GUI gui;
 
     public ComputerPlayer(Colour colour, Board board, GUI gui, Turn turn, MoveHistory moveHistory) {
         super(colour, board, gui, turn, moveHistory);
         //set up the GUI
         this.move = new MoveEngine(moveHistory);
+        this.gui = gui;
         infoPanel();
         gui.addSidePanel(panel);
         //root = new Node(null, board);
@@ -100,7 +100,7 @@ public class ComputerPlayer extends Player implements Runnable {
                         parents.push(child);
                     } else {
                         //Evaluate child node when at the deepest depth
-                        double evaluation = moveEngine.evaluateState(tempNode.getState(), tempNode.getState(), evaluationColour);
+                        double evaluation = moveEngine.evaluateState(tempNode.getState(), evaluationColour);
                         child.setEvaluation(evaluation);
                         child.setStartLocation(startLocation);
                         child.setEndLocation(move);
@@ -167,65 +167,62 @@ public class ComputerPlayer extends Player implements Runnable {
         }*/
     }
 
-    private void grahamBestMove() {
-        Location bestStart = null, bestEnd = null;
+//    private void grahamBestMove() {
+//        Location bestStart = null, bestEnd = null;
+//
+//        double bestScore = Double.NEGATIVE_INFINITY;
+//        State temp = board.clone();
+//        for (Piece piece : temp.getPieces(getColour()).getAll()) {
+//            Pair<Location, Double> results = moveEngine.getBestMove(piece, temp, board);
+//            if (results.getValue() > bestScore) {
+//                bestStart = piece.getLocation();
+//                bestEnd = results.getKey();
+//                bestScore = results.getValue();
+//            }
+//        }
+//        moveEngine.move(board.getPiece(bestStart), bestEnd, board);
+//        moveHistory.addMove(getColour(), board.getLastMoveStart(), board.getLastMoveEnd());//history 
+//        board.getPiece(board.getLastMoveEnd()).setSelected(true); //select the newly moved piece 
+//        moveEngine.highlightCheck(board); //in check checker 
+//        gui.repaint();
+//        getTurn().next();
+//    }
 
-        double bestScore = Double.NEGATIVE_INFINITY;
-        State temp = board.clone();
-        for (Piece piece : temp.getPieces(getColour()).getAll()) {
-            Pair<Location, Double> results = moveEngine.getBestMove(piece, temp, board);
-            if (results.getValue() > bestScore) {
-                bestStart = piece.getLocation();
-                bestEnd = results.getKey();
-                bestScore = results.getValue();
-            }
+
+    private GNode grahamMiniMax(GNode node, int depth, Boolean maximizingPlayer) {
+        if (depth == 0) {
+            node.setEvaluation(moveEngine.evaluateState(node.getState(), maximizingPlayer ? Colour.WHITE : Colour.BLACK));
+            return node;
         }
-//        board.movePiece(bestStart, bestEnd);
-        moveEngine.move(board.getPiece(bestStart), bestEnd, board);
-
-        moveHistory.addMove(getColour(), board.getLastMoveStart(), board.getLastMoveEnd());//history 
-        board.getPiece(board.getLastMoveEnd()).setSelected(true); //select the newly moved piece 
-        moveEngine.highlightCheck(board); //in check checker 
-        gui.repaint();
-        getTurn().next();
-    }
-
-
-    private State getBestMove(int depth) {
-     /*   State bestState = null;
-        double bestStateScore = Double.NEGATIVE_INFINITY;
-        Node moves = new Node(null, board, 0);
-        Queue<Node> fringe = new LinkedList<Node>();
-        fringe.add(moves);
-
-        // moves.addChild(new Node(board, moveEngine.evaluateState(board, board, getColour())));
-        //tries all available moves and picks the one with the best evaluation score
-        while (fringe.size() > 0) {
-            Node temp = fringe.poll();
-            for (Piece piece : temp.getState().getBlackPieces().getAll()) {
-                Stack<State> stateStack = moveEngine.getPossibleStates(piece, temp.getState()); //get possible states
-                for (State s : stateStack) {
-                    double evaluation = moveEngine.evaluateState(s, temp.getState(), getColour());
-                    Node child = new Node(temp, s, evaluation);
-                    temp.addChild(child);
-                    if (temp.getDepth() < depth - 1) {
-                        fringe.add(child);
-                    }
-                    if (evaluation > bestStateScore) {
-                        Node tempParent = child;
-                        while ((tempParent.getDepth() > 1)) {
-                            tempParent = tempParent.getParent();
-                        }
-                        bestState = tempParent.getState(); //Goes up the tree to the parent that produced the best child.
-                        bestStateScore = evaluation;
+        if (maximizingPlayer) {
+            GNode max = new GNode(null);
+            max.setEvaluation(Double.NEGATIVE_INFINITY);
+            for (Piece piece : node.getState().getPieces(Colour.WHITE).getAll()) {
+                LinkedList<GNode> children = moveEngine.getPossibleStates(piece, node.getState());
+                for (GNode child : children) {
+                    GNode temp = grahamMiniMax(child, depth - 1, false);
+                    if (max.getEvaluation() < temp.getEvaluation()) {
+                        max = temp;
                     }
                 }
-
             }
-        } //while loop
-        return bestState;*/
-        return null;
+            return max;
+        } else {
+            GNode min = new GNode(null);
+            min.setEvaluation(Double.POSITIVE_INFINITY);
+            for (Piece piece : node.getState().getPieces(Colour.BLACK).getAll()) {
+                LinkedList<GNode> children = moveEngine.getPossibleStates(piece, node.getState());
+                for (GNode child : children) {
+                    GNode temp = grahamMiniMax(child, depth - 1, true);
+                    if (min.getEvaluation() > -temp.getEvaluation()) {
+                        min = temp;
+                    }
+                }
+            }
+            return min;
+        }
     }
+
 
     public void run() {
         while (runBool) {
@@ -235,8 +232,18 @@ public class ComputerPlayer extends Player implements Runnable {
                 e.printStackTrace();
             }
             if (getTurn().getTurn() == getColour()) {
-                ericSelectAndMove();
+//                ericSelectAndMove();
 //                grahamBestMove();
+                GNode root = new GNode(board);
+                GNode temp = grahamMiniMax(root, 1, false);
+
+                moveEngine.move(board.getPiece(temp.getState().getLastMoveStart()), temp.getState().getLastMoveEnd(), board);
+
+                temp.getState().displayBoard();
+
+                gui.repaint();
+                getTurn().next();
+
             }
         }
 

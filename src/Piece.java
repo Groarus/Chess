@@ -80,72 +80,74 @@ public abstract class Piece {
 
     @Override
     public Piece clone() {
-        if (this.getName() == Name.PAWN) {
-            Pawn p = new Pawn(this.getColour());
-            p.setLocation(this.getLocation().clone());
-            if (!(this.getPrevLocation() == null)) {
-                p.setPrevLocation(new Location(this.getPrevLocation().getX(), this.getPrevLocation().getY()));
-            } else {
-                p.setPrevLocation(null);
-            }
-            return p;
-        } else if (this.getName() == Name.KING) {
-            King k = new King(this.getColour());
-            k.setLocation(this.getLocation().clone());
-            if (!(this.getPrevLocation() == null)) {
-                k.setPrevLocation(new Location(this.getPrevLocation().getX(), this.getPrevLocation().getY()));
-            } else {
-                k.setPrevLocation(null);
-            }
-            return k;
-        } else if (this.getName() == Name.KNIGHT) {
-            Knight knight = new Knight(this.getColour());
-            knight.setLocation(this.getLocation().clone());
-            if (!(this.getPrevLocation() == null)) {
-                knight.setPrevLocation(new Location(this.getPrevLocation().getX(), this.getPrevLocation().getY()));
-            } else {
-                knight.setPrevLocation(null);
-            }
-            return knight;
-        } else if (this.getName() == Name.QUEEN) {
-            Queen q = new Queen(this.getColour());
-            q.setLocation(this.getLocation().clone());
-            if (!(this.getPrevLocation() == null)) {
-                q.setPrevLocation(new Location(this.getPrevLocation().getX(), this.getPrevLocation().getY()));
-            } else {
-                q.setPrevLocation(null);
-            }
-            return q;
-        } else if (this.getName() == Name.ROOK) {
-            Rook r = new Rook(this.getColour());
-            r.setLocation(this.getLocation().clone());
-            if (!(this.getPrevLocation() == null)) {
-                r.setPrevLocation(new Location(this.getPrevLocation().getX(), this.getPrevLocation().getY()));
-            } else {
-                r.setPrevLocation(null);
-            }
-            return r;
-        } else if (this.getName() == Name.BISHOP) {
-            Bishop b = new Bishop(this.getColour());
-            b.setLocation(this.getLocation().clone());
-            if (!(this.getPrevLocation() == null)) {
-                b.setPrevLocation(new Location(this.getPrevLocation().getX(), this.getPrevLocation().getY()));
-            } else {
-                b.setPrevLocation(null);
-            }
-            return b;
-        } else {
-            Empty e = new Empty();
-            if (!(this.getLocation() == null)) {
-                e.setLocation(this.getLocation().clone());
-            }
-            if (!(this.getPrevLocation() == null)) {
-                e.setPrevLocation(new Location(this.getPrevLocation().getX(), this.getPrevLocation().getY()));
-            } else {
-                e.setPrevLocation(null);
-            }
-            return e;
+        switch (this.getName()) {
+            case PAWN:
+                Pawn p = new Pawn(this.getColour());
+                p.setLocation(this.getLocation().clone());
+                if (!(this.getPrevLocation() == null)) {
+                    p.setPrevLocation(getPrevLocation().clone());
+                } else {
+                    p.setPrevLocation(null);
+                }
+                return p;
+            case KING:
+                King k = new King(this.getColour());
+                k.setLocation(this.getLocation().clone());
+                if (!(this.getPrevLocation() == null)) {
+                    k.setPrevLocation(getPrevLocation().clone());
+                } else {
+                    k.setPrevLocation(null);
+                }
+                return k;
+            case KNIGHT:
+                Knight knight = new Knight(this.getColour());
+                knight.setLocation(this.getLocation().clone());
+                if (!(this.getPrevLocation() == null)) {
+                    knight.setPrevLocation(getPrevLocation().clone());
+                } else {
+                    knight.setPrevLocation(null);
+                }
+                return knight;
+            case QUEEN:
+                Queen q = new Queen(this.getColour());
+                q.setLocation(this.getLocation().clone());
+                if (!(this.getPrevLocation() == null)) {
+                    q.setPrevLocation(getPrevLocation().clone());
+                } else {
+                    q.setPrevLocation(null);
+                }
+                return q;
+            case ROOK:
+                Rook r = new Rook(this.getColour());
+                r.setLocation(this.getLocation().clone());
+                if (!(this.getPrevLocation() == null)) {
+                    r.setPrevLocation(getPrevLocation().clone());
+                } else {
+                    r.setPrevLocation(null);
+                }
+                return r;
+            case BISHOP:
+                Bishop b = new Bishop(this.getColour());
+                b.setLocation(this.getLocation().clone());
+                if (!(this.getPrevLocation() == null)) {
+                    b.setPrevLocation(getPrevLocation().clone());
+                } else {
+                    b.setPrevLocation(null);
+                }
+                return b;
+            case EMPTY:
+                Empty e = new Empty();
+                if (!(this.getLocation() == null)) {
+                    e.setLocation(this.getLocation().clone());
+                }
+                if (!(this.getPrevLocation() == null)) {
+                    e.setPrevLocation(getPrevLocation().clone());
+                } else {
+                    e.setPrevLocation(null);
+                }
+                return e;
         }
+        return null;
     }
 //    @Override
 //    public Piece clone() {
@@ -209,7 +211,7 @@ public abstract class Piece {
 //                e.setLocation(new Location(this.getLocation().getX(), this.getLocation().getY()));
 //            }
 //            if (!(this.getPrevLocation() == null)) {
-//                e.setPrevLocation(new Location(this.getPrevLocation().getX(), this.getPrevLocation().getY()));
+//                e.setPrevLocation(getPrevLocation().clone());
 //            } else {
 //                e.setPrevLocation(null);
 //            }
