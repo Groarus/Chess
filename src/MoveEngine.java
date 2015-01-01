@@ -467,7 +467,7 @@ public class MoveEngine {
         blackMaterial += 0.1 * blackMobility;
 
         evaluation = whiteMaterial - blackMaterial;
-        evaluation = colour == Colour.WHITE ? (evaluation * 1) : (evaluation * -1);
+        evaluation = colour == Colour.BLACK ? (evaluation * 1) : (evaluation * -1);
         return (evaluation);
     }
 

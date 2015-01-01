@@ -191,13 +191,13 @@ public class ComputerPlayer extends Player implements Runnable {
 
     private GNode grahamMiniMax(GNode node, int depth, Boolean maximizingPlayer) {
         if (depth == 0) {
-            node.setEvaluation(moveEngine.evaluateState(node.getState(), maximizingPlayer ? Colour.WHITE : Colour.BLACK));
+            node.setEvaluation(moveEngine.evaluateState(node.getState(), maximizingPlayer ? Colour.BLACK : Colour.WHITE));
             return node;
         }
         if (maximizingPlayer) {
             GNode max = new GNode(null);
             max.setEvaluation(Double.NEGATIVE_INFINITY);
-            for (Piece piece : node.getState().getPieces(Colour.WHITE).getAll()) {
+            for (Piece piece : node.getState().getPieces(Colour.BLACK).getAll()) {
                 LinkedList<GNode> children = moveEngine.getPossibleStates(piece, node.getState());
                 for (GNode child : children) {
                     GNode temp = grahamMiniMax(child, depth - 1, false);
@@ -210,11 +210,11 @@ public class ComputerPlayer extends Player implements Runnable {
         } else {
             GNode min = new GNode(null);
             min.setEvaluation(Double.POSITIVE_INFINITY);
-            for (Piece piece : node.getState().getPieces(Colour.BLACK).getAll()) {
+            for (Piece piece : node.getState().getPieces(Colour.WHITE).getAll()) {
                 LinkedList<GNode> children = moveEngine.getPossibleStates(piece, node.getState());
                 for (GNode child : children) {
                     GNode temp = grahamMiniMax(child, depth - 1, true);
-                    if (min.getEvaluation() > -temp.getEvaluation()) {
+                    if (min.getEvaluation() > temp.getEvaluation()) {
                         min = temp;
                     }
                 }
@@ -235,7 +235,7 @@ public class ComputerPlayer extends Player implements Runnable {
 //                ericSelectAndMove();
 //                grahamBestMove();
                 GNode root = new GNode(board);
-                GNode temp = grahamMiniMax(root, 1, false);
+                GNode temp = grahamMiniMax(root, 2, false);
 
                 moveEngine.move(board.getPiece(temp.getState().getLastMoveStart()), temp.getState().getLastMoveEnd(), board);
 
