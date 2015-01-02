@@ -73,7 +73,6 @@ public class Node {
         this.state = state;
     }
 
-    ;
 
     public Node getParent() {
         return parent;

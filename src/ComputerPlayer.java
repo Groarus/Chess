@@ -210,7 +210,7 @@ public class ComputerPlayer extends Player implements Runnable {
 
     public GNode grahamMini(GNode node, int depth) {
         if (depth == 0) {
-            node.setEvaluation(moveEngine.evaluateState(node.getState(), getColour() == Colour.BLACK ? Colour.BLACK : Colour.WHITE));
+            node.setEvaluation(-(moveEngine.evaluateState(node.getState(), getColour() == Colour.BLACK ? Colour.BLACK : Colour.WHITE)));
             return node;
         }
         GNode min = new GNode(null);

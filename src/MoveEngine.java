@@ -466,8 +466,8 @@ public class MoveEngine {
             blackMobility += getPossibleMoves(piece, state).size();
         blackMaterial += 0.1 * blackMobility;
 
-        evaluation = whiteMaterial - blackMaterial;
-        evaluation = colour == Colour.BLACK ? (evaluation * 1) : (evaluation * -1);
+        evaluation = blackMaterial - whiteMaterial;
+      //  evaluation = colour == Colour.BLACK ? (evaluation * 1) : (evaluation * -1);
         return (evaluation);
     }
 
