@@ -21,6 +21,10 @@ public class Location {
         return this.y;
     }
 
+    public String print() {
+        return x + "\t" + y;
+    }
+
     @Override
     public Location clone() {
         return new Location(x, y);

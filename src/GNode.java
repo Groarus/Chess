@@ -7,6 +7,7 @@ public class GNode {
 
     private double evaluation;
     private State state;
+    private Location start, end;
 
     public GNode(State state) {
         this.state = state;
@@ -26,5 +27,18 @@ public class GNode {
 
     public void setEvaluation(double evaluation) {
         this.evaluation = evaluation;
+    }
+
+    public void saveMove(Location start, Location end) {
+        this.start = start;
+        this.end = end;
+    }
+
+    public Location getStart() {
+        return start;
+    }
+
+    public Location getEnd() {
+        return end;
     }
 }
