@@ -1,3 +1,6 @@
+import java.util.LinkedList;
+import java.util.Queue;
+
 /**
  * Project: Chess
  * Course: COSC 3P71 - Final Project
@@ -9,8 +12,10 @@ public class State {
 
     Player whitePlayer, blackPlayer;
     private Piece[][] state;
-    private Location lastMoveStart, lastMoveEnd;
+    private Location lastMoveStart, lastMoveEnd, firstMoveStart, firstMoveEnd;
     private StatePieces whitePieces, blackPieces;
+    private Queue<Location> moveHistoryStart = new LinkedList<Location>();
+    private Queue<Location> moveHistoryEnd = new LinkedList<Location>();
 
     public State() {
         this.state = new Piece[8][8];
@@ -26,6 +31,13 @@ public class State {
         return whitePieces;
     }
 
+    public Location getFirstMoveStart() {
+        return firstMoveStart;
+    }
+
+    public Location getFirstMoveEnd() {
+        return firstMoveEnd;
+    }
 
     public StatePieces getBlackPieces() {
         return blackPieces;
@@ -37,7 +49,16 @@ public class State {
     }
 
     public void setLastMoveStart(Location lastMoveStart) {
+        moveHistoryStart.add(lastMoveStart);
         this.lastMoveStart = lastMoveStart;
+    }
+
+    public Queue<Location> getMoveHistoryStart() {
+        return moveHistoryStart;
+    }
+
+    public Queue<Location> getMoveHistoryEnd() {
+        return moveHistoryEnd;
     }
 
     public Location getLastMoveEnd() {
@@ -45,6 +66,7 @@ public class State {
     }
 
     public void setLastMoveEnd(Location lastMoveEnd) {
+        moveHistoryEnd.add(lastMoveEnd);
         this.lastMoveEnd = lastMoveEnd;
     }
 

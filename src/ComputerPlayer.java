@@ -189,38 +189,42 @@ public class ComputerPlayer extends Player implements Runnable {
 //    }
 
 
-    private GNode grahamMiniMax(GNode node, int depth, Boolean maximizingPlayer) {
+    public GNode grahamMax(GNode node, int depth) {
         if (depth == 0) {
-            node.setEvaluation(moveEngine.evaluateState(node.getState(), maximizingPlayer ? Colour.BLACK : Colour.WHITE));
+            node.setEvaluation(moveEngine.evaluateState(node.getState(), getColour() == Colour.BLACK ? Colour.BLACK : Colour.WHITE));
             return node;
         }
-        if (maximizingPlayer) {
-            GNode max = new GNode(null);
-            max.setEvaluation(Double.NEGATIVE_INFINITY);
-            for (Piece piece : node.getState().getPieces(Colour.BLACK).getAll()) {
-                LinkedList<GNode> children = moveEngine.getPossibleStates(piece, node.getState());
-                for (GNode child : children) {
-                    GNode temp = grahamMiniMax(child, depth - 1, false);
-                    if (max.getEvaluation() < temp.getEvaluation()) {
-                        max = temp;
-                    }
+        GNode max = new GNode(null);
+        max.setEvaluation(Double.NEGATIVE_INFINITY);
+        for (Piece piece : node.getState().getPieces(Colour.BLACK).getAll()) {
+            LinkedList<GNode> children = moveEngine.getPossibleStates(piece, node.getState());
+            for (GNode child : children) {
+                GNode temp = grahamMini(child, depth - 1);
+                if (max.getEvaluation() < temp.getEvaluation()) {
+                    max = temp;
                 }
             }
-            return max;
-        } else {
-            GNode min = new GNode(null);
-            min.setEvaluation(Double.POSITIVE_INFINITY);
-            for (Piece piece : node.getState().getPieces(Colour.WHITE).getAll()) {
-                LinkedList<GNode> children = moveEngine.getPossibleStates(piece, node.getState());
-                for (GNode child : children) {
-                    GNode temp = grahamMiniMax(child, depth - 1, true);
-                    if (min.getEvaluation() > temp.getEvaluation()) {
-                        min = temp;
-                    }
-                }
-            }
-            return min;
         }
+        return max;
+    }
+
+    public GNode grahamMini(GNode node, int depth) {
+        if (depth == 0) {
+            node.setEvaluation(moveEngine.evaluateState(node.getState(), getColour() == Colour.BLACK ? Colour.BLACK : Colour.WHITE));
+            return node;
+        }
+        GNode min = new GNode(null);
+        min.setEvaluation(Double.POSITIVE_INFINITY);
+        for (Piece piece : node.getState().getPieces(Colour.WHITE).getAll()) {
+            LinkedList<GNode> children = moveEngine.getPossibleStates(piece, node.getState());
+            for (GNode child : children) {
+                GNode temp = grahamMax(child, depth - 1);
+                if (min.getEvaluation() > temp.getEvaluation()) {
+                    min = temp;
+                }
+            }
+        }
+        return min;
     }
 
 
@@ -235,11 +239,12 @@ public class ComputerPlayer extends Player implements Runnable {
 //                ericSelectAndMove();
 //                grahamBestMove();
                 GNode root = new GNode(board);
-                GNode temp = grahamMiniMax(root, 2, false);
+                GNode temp = grahamMax(root, 2);
 
-                moveEngine.move(board.getPiece(temp.getState().getLastMoveStart()), temp.getState().getLastMoveEnd(), board);
+                moveEngine.move(board.getPiece(temp.getState().getMoveHistoryStart().remove()), temp.getState().getMoveHistoryEnd().remove(), board);
 
                 temp.getState().displayBoard();
+                System.out.println(temp.getEvaluation());
 
                 gui.repaint();
                 getTurn().next();
