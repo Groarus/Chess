@@ -286,7 +286,7 @@ public class MoveEngine {
                             break;
                     }
                     goodState.movePiece(piece.getLocation(), toLocation);
-                    possible.add(new GNode(goodState));
+//                    possible.add(new GNode(goodState));
                 }
             }
         }

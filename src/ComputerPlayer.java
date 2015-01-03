@@ -18,6 +18,11 @@ public class ComputerPlayer extends Player implements Runnable {
     private Boolean runBool = true;
     private Node root;
     private GUI gui;
+    private LinkedList<TempMove> currentMoves = new LinkedList<TempMove>();
+    private LinkedList<TempMove> bestTempMovesMIN = new LinkedList<TempMove>();
+    private LinkedList<TempMove> bestTempMovesMAX = new LinkedList<TempMove>();
+    private TempMove bestMove[];
+
 
     public ComputerPlayer(Colour colour, Board board, GUI gui, Turn turn, MoveHistory moveHistory) {
         super(colour, board, gui, turn, moveHistory);
@@ -189,101 +194,100 @@ public class ComputerPlayer extends Player implements Runnable {
 //    }
 
 
-    public GNode grahamMax(GNode node, int depth, GNode alpha, GNode beta) {
+//    public GNode grahamMax(GNode node, int depth, GNode alpha, GNode beta) {
+//        if (depth == 0) {
+//            node.setEvaluation(moveEngine.evaluateState(node.getState(), Colour.BLACK));
+//            return node;
+//        }
+//
+//        for (Piece piece : node.getState().getPieces(Colour.BLACK).getAll()) {
+//            LinkedList<GNode> children = moveEngine.getPossibleStates(piece, node.getState());
+//            for (GNode child : children) {
+//                GNode temp = grahamMini(child, depth - 1, alpha, beta);
+//                if (alpha.getEvaluation() < temp.getEvaluation()) {
+//                    alpha = temp;
+//                }
+//                if (beta.getEvaluation() <= alpha.getEvaluation())
+//                    return alpha;
+//            }
+//        }
+//        return alpha;
+//    }
+//
+//    public GNode grahamMini(GNode node, int depth, GNode alpha, GNode beta) {
+//        if (depth == 0) {
+//            node.setEvaluation(-(moveEngine.evaluateState(node.getState(), Colour.WHITE)));
+//            return node;
+//        }
+//
+//        for (Piece piece : node.getState().getPieces(Colour.WHITE).getAll()) {
+//            LinkedList<GNode> children = moveEngine.getPossibleStates(piece, node.getState());
+//            for (GNode child : children) {
+//                GNode temp = grahamMax(child, depth - 1, alpha, beta);
+//                if (beta.getEvaluation() > temp.getEvaluation()) {
+//                    beta = temp;
+//                }
+//                if (beta.getEvaluation() <= alpha.getEvaluation())
+//                    return beta;
+//            }
+//        }
+//        return beta;
+//    }
+
+    public double grahamMaxMove(int depth) {
         if (depth == 0) {
-            node.setEvaluation(moveEngine.evaluateState(node.getState(), Colour.BLACK));
-            return node;
+            return moveEngine.evaluateState(board, Colour.BLACK);
         }
+        double max = Double.NEGATIVE_INFINITY;
 
-        for (Piece piece : node.getState().getPieces(Colour.BLACK).getAll()) {
-            LinkedList<GNode> children = moveEngine.getPossibleStates(piece, node.getState());
-            for (GNode child : children) {
-                GNode temp = grahamMini(child, depth - 1, alpha, beta);
-                if (alpha.getEvaluation() < temp.getEvaluation()) {
-                    alpha = temp;
-                }
-                if (beta.getEvaluation() <= alpha.getEvaluation())
-                    return alpha;
-            }
-        }
-        return alpha;
-    }
-
-    public GNode grahamMini(GNode node, int depth, GNode alpha, GNode beta) {
-        if (depth == 0) {
-            node.setEvaluation(-(moveEngine.evaluateState(node.getState(), Colour.WHITE)));
-            return node;
-        }
-
-        for (Piece piece : node.getState().getPieces(Colour.WHITE).getAll()) {
-            LinkedList<GNode> children = moveEngine.getPossibleStates(piece, node.getState());
-            for (GNode child : children) {
-                GNode temp = grahamMax(child, depth - 1, alpha, beta);
-                if (beta.getEvaluation() > temp.getEvaluation()) {
-                    beta = temp;
-                }
-                if (beta.getEvaluation() <= alpha.getEvaluation())
-                    return beta;
-            }
-        }
-        return beta;
-    }
-
-    public GNode grahamMaxMove(GNode node, int depth) {
-        if (depth == 0) {
-            node.setEvaluation(moveEngine.evaluateState(node.getState(), Colour.BLACK));
-            return node;
-        }
-        GNode max = new GNode(null);
-        max.setEvaluation(Double.NEGATIVE_INFINITY);
-
-        for (Piece piece : node.getState().getPieces(Colour.BLACK).getAll()) {
-            Stack<Location> children = moveEngine.getPossibleMoves(piece, node.getState());
+        for (Piece piece : board.getPieces(Colour.BLACK).getAll()) {
+            Stack<Location> children = moveEngine.getPossibleMoves(piece, board);
             for (Location child : children) {
-                TempMove tempMove = new TempMove(piece, node.getState());
+                TempMove tempMove = new TempMove(piece, board);
                 tempMove.move(child);
+                currentMoves.add(tempMove);
 
-                GNode temp = grahamMiniMove(node, depth - 1);
-                if (max.getEvaluation() < temp.getEvaluation()) {
-                    //IF YOU UNCOMMENT THESE 2 LINES AND COMMENT THE 3RD
-                    //Then print the state of temp in the run method, you'll see it works
-                    //But it's cloning the best state (making it slow)
-                    //Instead of cloning it we need to save the moves of this state
+                double score = grahamMiniMove(depth - 1);
 
-//                    max.setEvaluation(temp.getEvaluation());
-//                    max.setState(temp.getState().clone());
-                    max = temp;
-                }
                 tempMove.undoMove();
+                currentMoves.remove(tempMove);
+                if (score > max) {
+                    bestTempMovesMAX.clear();
+                    bestTempMovesMAX.addAll(currentMoves);
+                    max = score;
+                    this.bestMove[depth] = tempMove;
+                }
+
             }
         }
         return max;
     }
 
-    public GNode grahamMiniMove(GNode node, int depth) {
+    public double grahamMiniMove(int depth) {
         if (depth == 0) {
-            node.setEvaluation(-(moveEngine.evaluateState(node.getState(), Colour.WHITE)));
-            return node;
+            return -(moveEngine.evaluateState(board, Colour.WHITE));
         }
-        GNode min = new GNode(null);
-        min.setEvaluation(Double.POSITIVE_INFINITY);
-        for (Piece piece : node.getState().getPieces(Colour.WHITE).getAll()) {
-            Stack<Location> children = moveEngine.getPossibleMoves(piece, node.getState());
-            for (Location child : children) {
-                TempMove tempMove = new TempMove(piece, node.getState());
-                tempMove.move(child);
-                GNode temp = grahamMaxMove(node, depth - 1);
-                if (min.getEvaluation() > temp.getEvaluation()) {
-                    //IF YOU UNCOMMENT THESE 2 LINES AND COMMENT THE 3RD
-                    //Then print the state of temp in the run method, you'll see it works
-                    //But it's cloning the best state (making it slow)
-                    //Instead of cloning it we need to save the moves of this state
+        double min = Double.POSITIVE_INFINITY;
 
-//                    min.setEvaluation(temp.getEvaluation());
-//                    min.setState(temp.getState().clone());
-                    min = temp;
-                }
+        for (Piece piece : board.getPieces(Colour.WHITE).getAll()) {
+            Stack<Location> children = moveEngine.getPossibleMoves(piece, board);
+            for (Location child : children) {
+                TempMove tempMove = new TempMove(piece, board);
+                tempMove.move(child);
+                currentMoves.add(tempMove);
+
+
+                double score = grahamMaxMove(depth - 1);
+
                 tempMove.undoMove();
+                currentMoves.remove(tempMove);
+                if (score < min) {
+                    bestTempMovesMIN.clear();
+                    bestTempMovesMIN.addAll(currentMoves);
+                    min = score;
+                    this.bestMove[depth] = tempMove;
+                }
+
             }
         }
         return min;
@@ -300,25 +304,30 @@ public class ComputerPlayer extends Player implements Runnable {
             if (getTurn().getTurn() == getColour()) {
 //                ericSelectAndMove();
 //                grahamBestMove();
-                GNode root = new GNode(board);
-                GNode max = new GNode(null);
-                max.setEvaluation(Double.NEGATIVE_INFINITY);
-                GNode min = new GNode(null);
-                min.setEvaluation(Double.POSITIVE_INFINITY);
+                GNode root = new GNode();
+//                GNode max = new GNode(null);
+//                max.setEvaluation(Double.NEGATIVE_INFINITY);
+//                GNode min = new GNode(null);
+//                min.setEvaluation(Double.POSITIVE_INFINITY);
 
 
 //                GNode temp = grahamMax(root, 1, max, min);
 
-                GNode temp = grahamMaxMove(root, 3);
-//                temp.getState().displayBoard();
+                int depth = 3;
+                bestMove = new TempMove[depth + 1];
+                grahamMaxMove(depth);
 
 
-//                moveEngine.move(board.getPiece(start), end, board);
+//                System.out.println("BEST FINAL ANSWER");
+//                System.out.println(bestMove[depth].getStartLocation().print() + "\t\t" + bestMove[depth].getToLocation().print());
 
-//                System.out.println(temp.getState().getMoveHistoryStart().remove().print() + " " + temp.getState().getMoveHistoryEnd().remove().print());
+                Location start = bestMove[depth].getStartLocation();
+                Location end = bestMove[depth].getToLocation();
 
-//                moveHistory.addMove(getColour(), board.getLastMoveStart(), board.getLastMoveEnd()); //history
-//                board.getPiece(board.getLastMoveEnd()).setSelected(true); //select the newly moved piece
+                moveEngine.move(board.getPiece(start), end, board);
+
+                moveHistory.addMove(getColour(), start, end); //history
+                board.getPiece(board.getLastMoveEnd()).setSelected(true); //select the newly moved piece
                 moveEngine.highlightCheck(board); //in check checker
                 gui.repaint();
                 getTurn().next();

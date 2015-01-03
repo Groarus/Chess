@@ -40,4 +40,8 @@ public class TempMove {
     public Location getToLocation() {
         return toLocation;
     }
+
+    public Location getStartLocation() {
+        return startLocation;
+    }
 }

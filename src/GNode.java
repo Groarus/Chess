@@ -1,3 +1,5 @@
+import java.util.LinkedList;
+
 /**
  * Project: Chess
  * Course:
@@ -6,19 +8,14 @@
 public class GNode {
 
     private double evaluation;
-    private State state;
-    private Location start, end;
+    private LinkedList<TempMove> tempMoves = new LinkedList<TempMove>();
 
-    public GNode(State state) {
-        this.state = state;
+    public GNode() {
     }
 
-    public State getState() {
-        return state;
-    }
-
-    public void setState(State state) {
-        this.state = state;
+    public GNode(LinkedList<TempMove> tempMoves, Double evaluation) {
+        this.tempMoves = tempMoves;
+        this.evaluation = evaluation;
     }
 
     public double getEvaluation() {
@@ -29,16 +26,11 @@ public class GNode {
         this.evaluation = evaluation;
     }
 
-    public void saveMove(Location start, Location end) {
-        this.start = start;
-        this.end = end;
+    public LinkedList<TempMove> getTempMoves() {
+        return tempMoves;
     }
 
-    public Location getStart() {
-        return start;
-    }
-
-    public Location getEnd() {
-        return end;
+    public void setTempMoves(LinkedList<TempMove> tempMoves) {
+        this.tempMoves = tempMoves;
     }
 }
