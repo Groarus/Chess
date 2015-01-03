@@ -1,4 +1,3 @@
-import java.util.LinkedList;
 import java.util.Stack;
 
 /**
@@ -250,122 +249,80 @@ public class MoveEngine {
         }
     }
 
-    public LinkedList<GNode> getPossibleStates(Piece piece, State state) {
-        LinkedList<GNode> possible = new LinkedList<GNode>();
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                Location toLocation = new Location(i, j);
-                special = specialMove.NONE;
-                if ((state.getPiece(toLocation).getColour() != piece.getColour()) && validateMove(piece, toLocation, state) && canMove(piece, toLocation, state)) {
-                    State goodState = state.clone();
 
-                    switch (special) {
-                        case ENPASSANT:
-                            state.setPiece(toLocation.getX(), toLocation.getY() + 1, new Empty());
-                            state.setPiece(toLocation.getX(), toLocation.getY() - 1, new Empty());
-
-                            Piece temp = state.getPiece(toLocation.getX(), toLocation.getY() + 1);
-                            state.getPieces(temp.getColour()).removePiece(temp);
-                            temp = state.getPiece(toLocation.getX(), toLocation.getY() - 1);
-                            state.getPieces(temp.getColour()).removePiece(temp);
-                            break;
-                        case CASTLE1:
-                            state.movePiece(new Location(toLocation.getX() + 1, toLocation.getY()), new Location(toLocation.getX() - 1, toLocation.getY()));
-                            break;
-                        case CASTLE2:
-                            state.movePiece(new Location(toLocation.getX() - 2, toLocation.getY()), new Location(toLocation.getX() + 1, toLocation.getY()));
-                            break;
-                        case PROMOTE:
-                            state.getPieces(piece.getColour()).removePiece(piece);
-                            if ((state.getWhitePlayer().getColour() == piece.getColour() && state.getWhitePlayer() instanceof ComputerPlayer) || (state.getBlackPlayer().getColour() == piece.getColour() && state.getBlackPlayer() instanceof ComputerPlayer)) {
-                                state.setPiece(piece.getLocation().getX(), piece.getLocation().getY(), new Queen(piece.getColour()));
-                            } else {
-                                state.setPiece(piece.getLocation().getX(), piece.getLocation().getY(), ((Pawn) piece).convert());
-                            }
-                            state.getPieces(piece.getColour()).addPiece(state.getPiece(piece.getLocation()));
-                            break;
-                    }
-                    goodState.movePiece(piece.getLocation(), toLocation);
-//                    possible.add(new GNode(goodState));
-                }
-            }
-        }
-        return possible;
-    }
-
-    public LinkedList<GNode> getPossibleChildren(Piece piece, State state) {
-        LinkedList<GNode> childNodes = new LinkedList<GNode>();
-
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                Location toLocation = new Location(i, j);
-                special = specialMove.NONE;
-                if ((state.getPiece(toLocation).getColour() != piece.getColour()) && validateMove(piece, toLocation, state) && canMove(piece, toLocation, state)) {
-                    Piece passant1 = null, passant2 = null;
-                    TempMove castle1 = null, castle2 = null;
-                    switch (special) {
-                        case ENPASSANT:
-                            passant1 = state.getPiece(toLocation.getX(), toLocation.getY() + 1);
-                            passant2 = state.getPiece(toLocation.getX(), toLocation.getY() - 1);
-
-                            state.getPieces(passant1.getColour()).removePiece(passant1);
-                            state.getPieces(passant2.getColour()).removePiece(passant2);
-
-                            state.setPiece(toLocation.getX(), toLocation.getY() + 1, new Empty());
-                            state.setPiece(toLocation.getX(), toLocation.getY() - 1, new Empty());
-                            break;
-                        case CASTLE1:
-                            System.out.println("CASTLE 1");
-                            castle1 = new TempMove(state.getPiece((toLocation.getX() + 1), toLocation.getY()), state);
-                            castle1.move(new Location(toLocation.getX() - 1, toLocation.getY()));
-                            break;
-                        case CASTLE2:
-                            System.out.println("CASTLE 2");
-                            castle2 = new TempMove(state.getPiece((toLocation.getX() - 2), toLocation.getY()), state);
-                            castle2.move(new Location(toLocation.getX() + 1, toLocation.getY()));
-                            break;
-                        case PROMOTE:
-                            state.getPieces(piece.getColour()).removePiece(state.getPiece(piece.getLocation()));
-                            state.setPiece(piece.getLocation().getX(), piece.getLocation().getY(), new Queen(piece.getColour()));
-                            state.getPieces(piece.getColour()).addQueen(state.getPiece(piece.getLocation()));
-                            break;
-                    }
-                    //Move the piece 
-                    TempMove mainMove = new TempMove(piece, state);
-                    mainMove.move(toLocation);
-
-                    //Evaluate the state 
-                    double evaluation = evaluateState(state, piece.getColour());
-//                    childNodes.add(new GNode(piece, toLocation, evaluation, mainMove));
-
-                    //Undo move and special cases
-                    mainMove.undoMove();
-                    switch (special) {
-                        case ENPASSANT:
-                            state.setPiece(toLocation.getX(), toLocation.getY() + 1, passant1);
-                            state.setPiece(toLocation.getX(), toLocation.getY() - 1, passant2);
-                            break;
-                        case CASTLE1:
-                            if (castle1 != null) {
-                                castle1.undoMove();
-                            }
-                            break;
-                        case CASTLE2:
-                            if (castle2 != null) {
-                                castle2.undoMove();
-                            }
-                            break;
-                        case PROMOTE:
-                            state.getPieces(piece.getColour()).removePiece(state.getPiece(piece.getLocation()));
-                            state.setPiece(piece.getLocation().getX(), piece.getLocation().getY(), new Pawn(piece.getColour()));
-                            state.getPieces(piece.getColour()).addPawn(state.getPiece(piece.getLocation()));
-                            break;
-                    }
-                }
-            }
-        }
-        return childNodes;
-    }
+//    public LinkedList<GNode> getPossibleChildren(Piece piece, State state) {
+//        LinkedList<GNode> childNodes = new LinkedList<GNode>();
+//
+//        for (int i = 0; i < 8; i++) {
+//            for (int j = 0; j < 8; j++) {
+//                Location toLocation = new Location(i, j);
+//                special = specialMove.NONE;
+//                if ((state.getPiece(toLocation).getColour() != piece.getColour()) && validateMove(piece, toLocation, state) && canMove(piece, toLocation, state)) {
+//                    Piece passant1 = null, passant2 = null;
+//                    TempMove castle1 = null, castle2 = null;
+//                    switch (special) {
+//                        case ENPASSANT:
+//                            passant1 = state.getPiece(toLocation.getX(), toLocation.getY() + 1);
+//                            passant2 = state.getPiece(toLocation.getX(), toLocation.getY() - 1);
+//
+//                            state.getPieces(passant1.getColour()).removePiece(passant1);
+//                            state.getPieces(passant2.getColour()).removePiece(passant2);
+//
+//                            state.setPiece(toLocation.getX(), toLocation.getY() + 1, new Empty());
+//                            state.setPiece(toLocation.getX(), toLocation.getY() - 1, new Empty());
+//                            break;
+//                        case CASTLE1:
+//                            System.out.println("CASTLE 1");
+//                            castle1 = new TempMove(state.getPiece((toLocation.getX() + 1), toLocation.getY()), state);
+//                            castle1.move(new Location(toLocation.getX() - 1, toLocation.getY()));
+//                            break;
+//                        case CASTLE2:
+//                            System.out.println("CASTLE 2");
+//                            castle2 = new TempMove(state.getPiece((toLocation.getX() - 2), toLocation.getY()), state);
+//                            castle2.move(new Location(toLocation.getX() + 1, toLocation.getY()));
+//                            break;
+//                        case PROMOTE:
+//                            state.getPieces(piece.getColour()).removePiece(state.getPiece(piece.getLocation()));
+//                            state.setPiece(piece.getLocation().getX(), piece.getLocation().getY(), new Queen(piece.getColour()));
+//                            state.getPieces(piece.getColour()).addQueen(state.getPiece(piece.getLocation()));
+//                            break;
+//                    }
+//                    //Move the piece 
+//                    TempMove mainMove = new TempMove(piece, state);
+//                    mainMove.move(toLocation);
+//
+//                    //Evaluate the state 
+//                    double evaluation = evaluateState(state, piece.getColour());
+////                    childNodes.add(new GNode(piece, toLocation, evaluation, mainMove));
+//
+//                    //Undo move and special cases
+//                    mainMove.undoMove();
+//                    switch (special) {
+//                        case ENPASSANT:
+//                            state.setPiece(toLocation.getX(), toLocation.getY() + 1, passant1);
+//                            state.setPiece(toLocation.getX(), toLocation.getY() - 1, passant2);
+//                            break;
+//                        case CASTLE1:
+//                            if (castle1 != null) {
+//                                castle1.undoMove();
+//                            }
+//                            break;
+//                        case CASTLE2:
+//                            if (castle2 != null) {
+//                                castle2.undoMove();
+//                            }
+//                            break;
+//                        case PROMOTE:
+//                            state.getPieces(piece.getColour()).removePiece(state.getPiece(piece.getLocation()));
+//                            state.setPiece(piece.getLocation().getX(), piece.getLocation().getY(), new Pawn(piece.getColour()));
+//                            state.getPieces(piece.getColour()).addPawn(state.getPiece(piece.getLocation()));
+//                            break;
+//                    }
+//                }
+//            }
+//        }
+//        return childNodes;
+//    }
 
 
     public Stack<Location> getPossibleMoves(Piece piece, State state) {
@@ -393,7 +350,7 @@ public class MoveEngine {
 
     private boolean isInCheck(Colour colour, State state) {
         try {
-            Location kingLocation = colour == Colour.WHITE ? state.getWhitePieces().getKing().peek().getLocation() : state.getBlackPieces().getKing().peek().getLocation();
+            Location kingLocation = state.getPieces(colour).getKing().peek().getLocation();
 
             StatePieces oppositePieces = colour == Colour.WHITE ? state.getBlackPieces() : state.getWhitePieces();
 
@@ -409,34 +366,6 @@ public class MoveEngine {
     }
 
     public double evaluateState(State state, Colour colour) {
-//        double evaluation = 0;
-//
-//        StatePieces colour1 = colour == Colour.WHITE ? state1.getWhitePieces() : state1.getBlackPieces();
-//        StatePieces opposite1 = colour == Colour.WHITE ? state1.getBlackPieces() : state1.getWhitePieces();
-//        StatePieces colour2 = colour == Colour.WHITE ? state2.getWhitePieces() : state2.getBlackPieces();
-//        StatePieces opposite2 = colour == Colour.WHITE ? state2.getBlackPieces() : state2.getWhitePieces();
-//
-////The difference in what we had plus the difference in what we have!
-//
-//        //                  state2  colour                  state2 opposite                     start1 colour               state1 opposite
-//        evaluation += 200 * ((colour2.getKing().size() - opposite2.getKing().size()) - (colour1.getKing().size() - opposite1.getKing().size()));
-//        evaluation += 9 * ((colour2.getQueens().size() - opposite2.getQueens().size()) - (colour1.getQueens().size() - opposite1.getQueens().size()));
-//        evaluation += 5 * ((colour2.getRooks().size() - opposite2.getRooks().size()) - (colour1.getRooks().size() - opposite1.getRooks().size()));
-//        evaluation += 3 * ((colour2.getBishops().size() - opposite2.getBishops().size()) - (colour1.getBishops().size() - opposite1.getBishops().size()));
-//        evaluation += 3 * ((colour2.getKnights().size() - opposite2.getKnights().size()) - (colour1.getKnights().size() - opposite1.getKnights().size()));
-//        evaluation += (colour2.getPawns().size() - opposite2.getPawns().size()) - (colour1.getPawns().size() - opposite1.getPawns().size());
-////        double whiteMobility = 0;
-//        for (Piece piece : whitePieces.getAll())
-//            whiteMobility += getPossibleMoves(piece, state2).size();
-//        whiteMaterial += 0.1 * whiteMobility;
-//
-//        double blackMobility = 0;
-//        for (Piece piece : blackPieces.getAll())
-//            blackMobility += getPossibleMoves(piece, state2).size();
-//        blackMaterial += 0.1 * blackMobility;
-
-//        return evaluation;
-        double evaluation;
         double whiteMaterial = 0;
         double blackMaterial = 0;
 
@@ -465,35 +394,14 @@ public class MoveEngine {
             blackMobility += getPossibleMoves(piece, state).size();
         blackMaterial += 0.1 * blackMobility;
 
-        evaluation = colour == Colour.WHITE ? whiteMaterial - blackMaterial : blackMaterial - whiteMaterial;
-
-      //  evaluation = colour == Colour.BLACK ? (evaluation * 1) : (evaluation * -1);
-        return (evaluation);
+        return colour == Colour.WHITE ? whiteMaterial - blackMaterial : blackMaterial - whiteMaterial;
     }
 
     private boolean canMove(Piece piece, Location toLocation, State state) {
-        Boolean ret;
-
-        Location startLocation = piece.getLocation();
-        Location prevLocation = piece.getPrevLocation();
-        Piece tempPiece = state.getPiece(toLocation);
-        Location lastMoveStart = state.getLastMoveStart();
-        Location lastMoveEnd = state.getLastMoveEnd();
-
-        state.movePiece(startLocation, toLocation);
-
-        ret = !isInCheck(piece.getColour(), state);
-
-        if (tempPiece.getName() != Piece.Name.EMPTY && tempPiece.getColour() == Colour.WHITE)
-            state.getWhitePieces().addPiece(tempPiece);
-        else if (tempPiece.getName() != Piece.Name.EMPTY && tempPiece.getColour() == Colour.BLACK)
-            state.getBlackPieces().addPiece(tempPiece);
-
-        state.movePiece(toLocation, startLocation);
-        state.setPiece(toLocation.getX(), toLocation.getY(), tempPiece);
-        state.setLastMoveStart(lastMoveStart);
-        state.setLastMoveEnd(lastMoveEnd);
-        piece.setPrevLocation(prevLocation);
+        TempMove tempMove = new TempMove(piece, state);
+        tempMove.move(toLocation);
+        Boolean ret = !isInCheck(piece.getColour(), state);
+        tempMove.undoMove();
         return ret;
     }
 

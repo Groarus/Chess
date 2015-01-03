@@ -26,10 +26,9 @@ public class TempMove {
     }
 
     public void undoMove() {
-        if (toPiece.getName() != Piece.Name.EMPTY && toPiece.getColour() == Colour.WHITE)
-            state.getWhitePieces().addPiece(toPiece);
-        else if (toPiece.getName() != Piece.Name.EMPTY && toPiece.getColour() == Colour.BLACK)
-            state.getBlackPieces().addPiece(toPiece);
+        if (toPiece.getName() != Piece.Name.EMPTY)
+            state.getPieces(toPiece.getColour()).addPiece(toPiece);
+
         state.movePiece(toLocation, startLocation);
         state.setPiece(toLocation.getX(), toLocation.getY(), toPiece);
         state.setLastMoveStart(lastMoveStart);

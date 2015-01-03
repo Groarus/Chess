@@ -52,7 +52,6 @@ public class Board extends State {
                 this.setPiece(i, j, new Empty());
             }
         }
-
         setStatePieces();
     }
 

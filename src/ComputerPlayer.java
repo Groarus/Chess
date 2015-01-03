@@ -22,7 +22,6 @@ public class ComputerPlayer extends Player implements Runnable {
         this.gui = gui;
         infoPanel();
         gui.addSidePanel(panel);
-        //root = new Node(null, board);
     }
 
     private void infoPanel() {
@@ -42,7 +41,7 @@ public class ComputerPlayer extends Player implements Runnable {
     }
 
 
-    public double Max(int depth, double alpha, double beta) {
+    public double Max(State board, int depth, double alpha, double beta) {
         if (depth == 0) {
             return moveEngine.evaluateState(board, Colour.BLACK);
         }
@@ -52,7 +51,7 @@ public class ComputerPlayer extends Player implements Runnable {
                 TempMove tempMove = new TempMove(piece, board);
                 tempMove.move(child);
 
-                double score = Min(depth - 1, alpha, beta);
+                double score = Min(board, depth - 1, alpha, beta);
 
                 tempMove.undoMove();
                 if (score > alpha) {
@@ -66,7 +65,7 @@ public class ComputerPlayer extends Player implements Runnable {
         return alpha;
     }
 
-    public double Min(int depth, double alpha, double beta) {
+    public double Min(State board, int depth, double alpha, double beta) {
         if (depth == 0) {
             return -(moveEngine.evaluateState(board, Colour.WHITE));
         }
@@ -76,7 +75,7 @@ public class ComputerPlayer extends Player implements Runnable {
                 TempMove tempMove = new TempMove(piece, board);
                 tempMove.move(child);
 
-                double score = Max(depth - 1, alpha, beta);
+                double score = Max(board, depth - 1, alpha, beta);
 
                 tempMove.undoMove();
                 if (score < beta) {
@@ -101,7 +100,9 @@ public class ComputerPlayer extends Player implements Runnable {
             if (getTurn().getTurn() == getColour()) {
                 int depth = 3;
                 bestMove = new TempMove[depth + 1];
-                Max(depth, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+
+                State tempBoard = board.clone();
+                Max(tempBoard, depth, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
 
                 Location start = bestMove[depth].getStartLocation();
                 Location end = bestMove[depth].getToLocation();
