@@ -25,19 +25,51 @@ public class ComputerPlayer extends Player implements Runnable {
     }
 
     private void infoPanel() {
-        panel = new JPanel(new GridBagLayout());
+        //main panel
+        panel = new JPanel(new BorderLayout());
+
+
+        //nested panels
+        JPanel statsPanel = new JPanel(new GridBagLayout());
+
+        JLabel human = new JLabel("Computer");
+        human.setFont(new Font("Serif", Font.BOLD, 20));
+        panel.add(human, BorderLayout.NORTH);
+
 
         GridBagConstraints constraints = new GridBagConstraints();
-
-        constraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        constraints.weightx = 1;
-        constraints.weighty = 1;
+        constraints.anchor = GridBagConstraints.LINE_START;
+        constraints.weightx = .3;
+        constraints.weighty = 0;
         constraints.gridx = 0;
         constraints.gridy = 0;
 
-        JLabel computer = new JLabel("Computer");
-        computer.setFont(new Font("Serif", Font.BOLD, 20));
-        panel.add(computer, constraints);
+        JLabel numMovesLabel = new JLabel("Moves:");
+        numMovesLabel.setFont(new Font("Serif", Font.BOLD, 16));
+        statsPanel.add(numMovesLabel, constraints);
+
+        constraints.gridx = 1;
+        constraints.gridy = 0;
+        statsPanel.add(numMovesValue, constraints);
+
+        //SPACER
+        constraints.gridx = 0;
+        constraints.gridy = 1;
+        statsPanel.add(new JLabel("  "), constraints);
+        constraints.gridx = 1;
+        constraints.gridy = 1;
+        statsPanel.add(new JLabel("  "), constraints);
+
+        constraints.gridx = 0;
+        constraints.gridy = 2;
+        JLabel piecesLeftLabel = new JLabel("Pieces: ");
+        piecesLeftLabel.setFont(new Font("Serif", Font.BOLD, 16));
+        statsPanel.add(piecesLeftLabel, constraints);
+
+        constraints.gridx = 1;
+        constraints.gridy = 2;
+        statsPanel.add(piecesLeftValue, constraints);
+        panel.add(statsPanel, BorderLayout.CENTER);
     }
 
 
@@ -114,9 +146,7 @@ public class ComputerPlayer extends Player implements Runnable {
                 moveEngine.highlightCheck(board); //in check checker
                 gui.repaint();
                 getTurn().next();
-
             }
         }
-
     }
 }

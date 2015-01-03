@@ -62,17 +62,16 @@ public class HumanPlayer extends Player implements Runnable {
                         }
                     }
                     if (row != -1 && column != -1) {  //if row/column has actually been clicked
-                        if (mouseEvent.getButton() == MouseEvent.BUTTON1) { //left click
-                            if (board.getPiece(column, row).getName() != Piece.Name.EMPTY && board.getPiece(column, row).getColour() == getColour()) { //if its not an empty selection and the right colour is selected
-                                board.resetHighlight(); //clears all highlighted pieces
-                                moveEngine.highlightCheck(board); //highlight the king if in check
-                                selected = board.getPiece(column, row);
-                                selected.setLocation(new Location(column, row)); //setting the location of the piece as it is not set prior
-                                selected.setSelected(true);
-                                possibleMove();
-                                gui.repaint();
-                            }
-                        } else if (mouseEvent.getButton() == MouseEvent.BUTTON3) { //right click
+                        //SELECT PIECE
+                        if (board.getPiece(column, row).getColour() == getColour()) {
+                            board.resetHighlight(); //clears all highlighted pieces
+                            moveEngine.highlightCheck(board); //highlight the king if in check
+                            selected = board.getPiece(column, row);
+                            selected.setLocation(new Location(column, row)); //setting the location of the piece as it is not set prior
+                            selected.setSelected(true);
+                            possibleMove();
+                            gui.repaint();
+                        } else { //MOVE PIECE
                             if (selected.getName() != Piece.Name.EMPTY) {
                                 board.resetHighlight();
                                 if (move.move(selected, new Location(column, row), board)) { //MAIN MOVEMENT OF PLAYER
