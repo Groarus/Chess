@@ -16,6 +16,8 @@ public class Player {
     private int numMoves = 0, piecesLeft = 16;
     private Colour colour;
     private Turn turn;
+    protected boolean isRunning = true;
+    protected boolean freePlay = false;
 
     public Player(Colour colour, Board board, GUI gui, Turn turn, MoveHistory moveHistory) {
         this.turn = turn;
@@ -54,4 +56,11 @@ public class Player {
         return this.turn;
     }
 
+    public void kill(){
+        isRunning = false;
+    }
+
+    public Boolean getFreePlay(){
+        return freePlay;
+    }
 }

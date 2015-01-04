@@ -19,10 +19,22 @@ public class HumanPlayer extends Player implements Runnable {
     private Boolean clickFlag = false;
     private MouseEvent mouseEvent;
 
+    public HumanPlayer(Colour colour, Board board, GUI gui, Turn turn, MoveHistory moveHistory, Boolean freePlay) {
+        super(colour, board, gui, turn, moveHistory);
+        this.move = new MoveEngine(moveHistory);
+        this.board = board;
+        this.freePlay = freePlay;
+        //set up the gui
+        infoPanel();
+        gui.addSidePanel(panel);
+        guiListener();
+    }
+
     public HumanPlayer(Colour colour, Board board, GUI gui, Turn turn, MoveHistory moveHistory) {
         super(colour, board, gui, turn, moveHistory);
         this.move = new MoveEngine(moveHistory);
         this.board = board;
+        freePlay = false;
         //set up the gui
         infoPanel();
         gui.addSidePanel(panel);
@@ -32,13 +44,13 @@ public class HumanPlayer extends Player implements Runnable {
 
     @Override
     public void run() {
-        while (true) {
+        while (isRunning) {
             try {
                 Thread.sleep(150);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            if (getTurn().getTurn() == getColour()) {
+            if (getTurn().getTurn() == getColour() || freePlay == true) {
                 gui.setBorder(panel, Color.red, 3);
                 if (clickFlag) {
                     int x = mouseEvent.getX();
@@ -69,18 +81,25 @@ public class HumanPlayer extends Player implements Runnable {
                             selected = board.getPiece(column, row);
                             selected.setLocation(new Location(column, row)); //setting the location of the piece as it is not set prior
                             selected.setSelected(true);
-                            possibleMove();
+                            if (!freePlay) {
+                                possibleMove();
+                            }
                             gui.repaint();
                         } else { //MOVE PIECE
-                            if (selected.getName() != Piece.Name.EMPTY) {
+                            if (selected.getName() != Piece.Name.EMPTY && selected.getColour() == getColour()) {
                                 board.resetHighlight();
+
                                 if (move.move(selected, new Location(column, row), board)) { //MAIN MOVEMENT OF PLAYER
-                                    moveHistory.addMove(selected.getColour(), selected.getPrevLocation(), new Location(column, row)); //History
+                                    if (!freePlay) {
+                                        moveHistory.addMove(selected.getColour(), selected.getPrevLocation(), new Location(column, row)); //History
+                                    }
                                     gui.setBorder(panel, Color.darkGray, 1); //Info panel border
                                     getTurn().next();
                                 }
+
                                 gui.repaint(); //refreshes the board
                                 selected = new Empty(); //deselect it
+                                //      selected.setSelected(false);
                             }
                         }
                     }
@@ -177,4 +196,5 @@ public class HumanPlayer extends Player implements Runnable {
         while (!possible.isEmpty())
             board.getPiece(possible.pop()).setPossibleMove(true);
     }
+
 }

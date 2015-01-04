@@ -12,8 +12,10 @@ import java.io.IOException;
 public class ControlPanel extends JPanel {
 
     private MoveHistory moveHistory;
-
-    public ControlPanel(final MoveHistory moveHistory) {
+    private Player player1, player2;
+    public ControlPanel(final MoveHistory moveHistory, Player p1, Player p2, Boolean inFreePlay) {
+        player1 = p1;
+        player2 = p2;
         this.moveHistory = moveHistory;
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createLineBorder(Color.black, 3));
@@ -24,9 +26,13 @@ public class ControlPanel extends JPanel {
 
         JButton saveButton = new JButton("Save");
         JButton quitButton = new JButton("Quit");
+        JButton convertButton = new JButton("Convert");
 
         JPanel centerPanel = new JPanel(new FlowLayout());
         centerPanel.add(saveButton);
+        if (inFreePlay) {
+            centerPanel.add(convertButton);
+        }
         add(centerPanel, BorderLayout.CENTER);
 
         add(quitButton, BorderLayout.SOUTH);
@@ -44,6 +50,19 @@ public class ControlPanel extends JPanel {
                 try {
                     moveHistory.saveGame();
                 } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+
+            }
+        });
+
+        convertButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    player1.kill();
+                    player2.kill();
+                } catch (Exception e1) {
                     e1.printStackTrace();
                 }
 

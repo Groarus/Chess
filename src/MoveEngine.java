@@ -37,7 +37,7 @@ public class MoveEngine {
 
     public boolean move(Piece piece, Location toLocation, State state) {
         special = specialMove.NONE;
-        if (validateMove(piece, toLocation, state) && canMove(piece, toLocation, state)) {
+        if ((validateMove(piece, toLocation, state) && canMove(piece, toLocation, state)) || state.getWhitePlayer().getFreePlay()) {
             boolean overtaken = false;
             switch (special) {
                 case ENPASSANT:

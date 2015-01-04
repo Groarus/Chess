@@ -15,25 +15,39 @@ public class Chess {
     private Turn turn = new Turn();
     private MoveHistory moveHistory = new MoveHistory();
     private MoveEngine moveEngine = new MoveEngine(moveHistory);
-    private ControlPanel controlPanel = new ControlPanel(moveHistory);
+    private ControlPanel controlPanel;
     private Boolean showMoves = false;
 
     public Chess() {
-        Object[] options = {"Human vs. Computer", "Human vs. Human", "Load Game"};
-        int choice = JOptionPane.showOptionDialog(null, "Choose your game type", "Colour Option", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+        displayOptions(true);
+    }
 
+    private void displayOptions(Boolean newRun) {
+        if (newRun == false) {
+            gui.dispose();
+            gui = new GUI();
+            PaintBoard paintBoard = new PaintBoard(board);
+            gui.addBoardPanel(paintBoard);
+        }
+        Object[] options = {"Human vs. Computer", "Human vs. Human", "Load Game", "Free Play"};
+        int choice = JOptionPane.showOptionDialog(null, "Choose your game type", "Colour Option", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
         switch (choice) {
             case 0:
                 SinglePlay(false);
+                break;
             case 1:
                 DoublePlay(false);
+                break;
             case 2:
                 try {
                     LoadGame();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                break;
+            case 3:
+                freePlay();
                 break;
         }
     }
@@ -55,6 +69,31 @@ public class Chess {
             SinglePlay(true);
     }
 
+    private void freePlay() {
+        HumanPlayer humanPlayer1;
+        HumanPlayer humanPlayer2;
+        humanPlayer2 = new HumanPlayer(Colour.BLACK, board, gui, turn, moveHistory, true);
+        humanPlayer1 = new HumanPlayer(Colour.WHITE, board, gui, turn, moveHistory, true);
+        controlPanel = new ControlPanel(moveHistory, humanPlayer1, humanPlayer2, true);
+        gui.addSidePanel(controlPanel);
+        board.setWhitePlayer(humanPlayer1);
+        board.setBlackPlayer(humanPlayer2);
+        moveHistory.setData(humanPlayer1, humanPlayer2);
+
+        Thread player1 = new Thread(humanPlayer1);
+        Thread player2 = new Thread(humanPlayer2);
+        player1.start();
+        player2.start();
+        gui.startGUI(); //makes the gui visible
+        try {
+            player1.join();
+        } catch (InterruptedException ex) {
+            System.out.println("Didn't Work");
+        }
+
+        convert();
+    }
+
     private void SinglePlay(Boolean loadGame) {
         Object[] options2 = {"White", "Black"};
         int choice = JOptionPane.showOptionDialog(null, "Do you want to be White or Black?", "Colour Option", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options2, options2[0]);
@@ -63,15 +102,17 @@ public class Chess {
         HumanPlayer humanPlayer;
         if (choice == 0) {
             computerPlayer = new ComputerPlayer(Colour.BLACK, board, gui, turn, moveHistory);
-            gui.addSidePanel(controlPanel);
             humanPlayer = new HumanPlayer(Colour.WHITE, board, gui, turn, moveHistory);
+            controlPanel = new ControlPanel(moveHistory, humanPlayer, computerPlayer, false);
+            gui.addSidePanel(controlPanel);
             board.setWhitePlayer(humanPlayer);
             board.setBlackPlayer(computerPlayer);
 
         } else {
             computerPlayer = new ComputerPlayer(Colour.WHITE, board, gui, turn, moveHistory);
-            gui.addSidePanel(controlPanel);
             humanPlayer = new HumanPlayer(Colour.BLACK, board, gui, turn, moveHistory);
+            controlPanel = new ControlPanel(moveHistory, humanPlayer, computerPlayer, false);
+            gui.addSidePanel(controlPanel);
             board.setWhitePlayer(computerPlayer);
             board.setBlackPlayer(humanPlayer);
         }
@@ -113,10 +154,8 @@ public class Chess {
             }
         }
 
-
         try {
             humanThread.join();
-            computerThread.join();
         } catch (InterruptedException ex) {
             System.out.println("Didn't Work");
         }
@@ -126,8 +165,10 @@ public class Chess {
         HumanPlayer humanPlayer1;
         HumanPlayer humanPlayer2;
         humanPlayer2 = new HumanPlayer(Colour.BLACK, board, gui, turn, moveHistory);
-        gui.addSidePanel(controlPanel);
         humanPlayer1 = new HumanPlayer(Colour.WHITE, board, gui, turn, moveHistory);
+        controlPanel = new ControlPanel(moveHistory, humanPlayer1, humanPlayer2, false);
+        gui.addSidePanel(controlPanel);
+
         board.setWhitePlayer(humanPlayer1);
         board.setBlackPlayer(humanPlayer2);
         moveHistory.setData(humanPlayer1, humanPlayer2);
@@ -166,12 +207,15 @@ public class Chess {
                     }
             }
         }
-
         try {
             player1.join();
-            player2.join();
         } catch (InterruptedException ex) {
             System.out.println("Didn't Work");
         }
+
+    }
+
+    private void convert() {
+        displayOptions(false);
     }
 }
