@@ -21,6 +21,7 @@ public class HumanPlayer extends Player implements Runnable {
 
     public HumanPlayer(Colour colour, Board board, GUI gui, Turn turn, MoveHistory moveHistory, Boolean freePlay) {
         super(colour, board, gui, turn, moveHistory);
+        System.out.println("Test so I can commit??");
         this.move = new MoveEngine(moveHistory);
         this.board = board;
         this.freePlay = freePlay;

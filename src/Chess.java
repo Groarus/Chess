@@ -70,6 +70,7 @@ public class Chess {
     }
 
     private void freePlay() {
+        System.out.println("Test so I can commit??");
         HumanPlayer humanPlayer1;
         HumanPlayer humanPlayer2;
         humanPlayer2 = new HumanPlayer(Colour.BLACK, board, gui, turn, moveHistory, true);

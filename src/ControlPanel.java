@@ -14,6 +14,7 @@ public class ControlPanel extends JPanel {
     private MoveHistory moveHistory;
     private Player player1, player2;
     public ControlPanel(final MoveHistory moveHistory, Player p1, Player p2, Boolean inFreePlay) {
+        System.out.println("Test so I can commit??");
         player1 = p1;
         player2 = p2;
         this.moveHistory = moveHistory;

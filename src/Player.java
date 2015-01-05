@@ -20,6 +20,7 @@ public class Player {
     protected boolean freePlay = false;
 
     public Player(Colour colour, Board board, GUI gui, Turn turn, MoveHistory moveHistory) {
+        System.out.println("Test so I can commit??");
         this.turn = turn;
         this.colour = colour;
         this.board = board;
