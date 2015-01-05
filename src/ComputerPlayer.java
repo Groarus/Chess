@@ -95,8 +95,14 @@ public class ComputerPlayer extends Player implements Runnable {
                 double evaluation = Max(tempBoard, ply, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
                 evaluationValue.setText(String.format("%.3f", evaluation));
 
-                while (bestMove[ply] == null && ply > 0)
-                    ply = ply - 1;
+                //If there is no best move
+                while (bestMove[ply] == null && ply > 0){
+                    ply--;
+                    bestMove = new TempMove[ply + 1];
+                    tempBoard = board.clone();
+                    evaluation = Max(tempBoard, ply, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+                    evaluationValue.setText(String.format("%.3f", evaluation));
+                }
 
                 if (bestMove[ply] != null) {
                     Location start = bestMove[ply].getStartLocation();
