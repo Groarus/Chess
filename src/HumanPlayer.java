@@ -79,6 +79,16 @@ public class HumanPlayer extends Player implements Runnable {
                                 if (selected.getName() != Piece.Name.EMPTY) {
                                     board.resetHighlight();
                                     if (move.move(selected, new Location(column, row), board)) { //MAIN MOVEMENT OF PLAYER
+                                        //    if (getColour() == Colour.WHITE ? board.getBlackPlayer() : board.getWhitePlayer() instanceof HumanPlayer)
+                                        if (getColour() == Colour.WHITE && board.getBlackPlayer() instanceof HumanPlayer && move.isInCheckmate(board, Colour.BLACK)) {
+                                            System.out.println("BLACK HUMAN IN CHECKMATE");
+                                        } else if (getColour() == Colour.BLACK && board.getWhitePlayer() instanceof HumanPlayer && move.isInCheckmate(board, Colour.WHITE)) {
+                                            System.out.println("WHITE HUMAN IN CHECKMATE");
+                                        } else if (getColour() == Colour.WHITE && board.getBlackPlayer() instanceof HumanPlayer && move.isInStalemate(board, Colour.BLACK)) {
+                                            System.out.println("BLACK HUMAN IN STALEMATE");
+                                        } else if (getColour() == Colour.BLACK && board.getWhitePlayer() instanceof HumanPlayer && move.isInStalemate(board, Colour.WHITE)) {
+                                            System.out.println("WHITE HUMAN IN STALEMATE");
+                                        }
                                         moveHistory.addMove(selected.getColour(), selected.getPrevLocation(), new Location(column, row)); //History
                                         gui.setBorder(panel, Color.darkGray, 1); //Info panel border
                                         getTurn().next();
