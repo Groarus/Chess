@@ -5,7 +5,7 @@
  */
 
 public class Turn {
-    //Used to keep track of whos turn
+    //Used to keep track of who's turn it is
     private Colour turn;
 
     public Turn() {

@@ -18,6 +18,30 @@ public class State {
         this.blackPieces = new StatePieces();
     }
 
+    public void movePiece(Location startLocation, Location endLocation) {
+        try {
+            //Overtaking a piece
+            if (getPiece(endLocation).getColour() != Colour.NEUTRAL) {
+                getPieces(getPiece(endLocation).getColour()).removePiece(getPiece(endLocation));
+                if (this instanceof Board) {
+                    getWhitePlayer().setPiecesLeft(getWhitePieces().getAll().size());
+                    getBlackPlayer().setPiecesLeft(getBlackPieces().getAll().size());
+                }
+            }
+
+            int startX = startLocation.getX(), startY = startLocation.getY(), endX = endLocation.getX(), endY = endLocation.getY();
+            state[endX][endY] = state[startX][startY]; //move the piece
+            state[startX][startY] = new Empty(); //old location to empty piece
+            state[startX][startY].setLocation(new Location(startX, startY));
+            state[endX][endY].setLocation(endLocation);
+            state[endX][endY].setPrevLocation(startLocation);
+            lastMoveStart = startLocation;
+            lastMoveEnd = endLocation;
+
+        } catch (NullPointerException ignored) {
+        }
+    }
+
     public StatePieces getPieces(Colour colour) {
         return colour == Colour.WHITE ? getWhitePieces() : getBlackPieces();
     }
@@ -65,32 +89,6 @@ public class State {
         return state[location.getX()][location.getY()];
     }
 
-    public void movePiece(Location startLocation, Location endLocation) {
-        try {
-            //Overtaking a piece
-            if (getPiece(endLocation).getColour() != Colour.NEUTRAL) {
-                getPieces(getPiece(endLocation).getColour()).removePiece(getPiece(endLocation));
-                if (this instanceof Board) {
-                    getWhitePlayer().setPiecesLeft(getWhitePieces().getAll().size());
-                    getBlackPlayer().setPiecesLeft(getBlackPieces().getAll().size());
-                }
-            }
-
-
-            int startX = startLocation.getX(), startY = startLocation.getY(), endX = endLocation.getX(), endY = endLocation.getY();
-            state[endX][endY] = state[startX][startY]; //move the piece
-            state[startX][startY] = new Empty(); //old location to empty piece
-            state[startX][startY].setLocation(new Location(startX, startY));
-            state[endX][endY].setLocation(endLocation);
-            state[endX][endY].setPrevLocation(startLocation);
-            lastMoveStart = startLocation;
-            lastMoveEnd = endLocation;
-
-        } catch (NullPointerException e) {
-            System.out.print("More than likely, Checkmate"); //Not quite 100% this is always the case
-        }
-    }
-
     public Player getWhitePlayer() {
         return whitePlayer;
     }
@@ -106,7 +104,6 @@ public class State {
     public void setBlackPlayer(Player blackPlayer) {
         this.blackPlayer = blackPlayer;
     }
-
 
     public void setStatePieces() {
         for (int i = 0; i < 8; i++) {

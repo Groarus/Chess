@@ -5,8 +5,8 @@ import java.util.Queue;
 
 /**
  * Project: Chess
- * Course:
- * Created on 19 December, 2014
+ * Course: COSC 3P71 - Final Project
+ * Created: December, 2014
  */
 public class MoveHistory {
 

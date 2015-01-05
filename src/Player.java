@@ -14,16 +14,11 @@ public class Player {
     protected JLabel piecesLeftValue, numMovesValue;
     protected MoveHistory moveHistory;
     private int numMoves = 0;
-
-
     private int piecesLeft = 16;
     private Colour colour;
     private Turn turn;
-    protected boolean isRunning = true;
-    protected boolean freePlay = false;
 
     public Player(Colour colour, Board board, GUI gui, Turn turn, MoveHistory moveHistory) {
-        System.out.println("Test so I can commit??");
         this.turn = turn;
         this.colour = colour;
         this.board = board;
@@ -36,10 +31,6 @@ public class Player {
 
     public Colour getColour() {
         return colour;
-    }
-
-    public JPanel getPanel() {
-        return panel;
     }
 
     public void incrementMoves() {
@@ -55,13 +46,5 @@ public class Player {
 
     public synchronized Turn getTurn() {
         return this.turn;
-    }
-
-    public void kill(){
-        isRunning = false;
-    }
-
-    public Boolean getFreePlay(){
-        return freePlay;
     }
 }

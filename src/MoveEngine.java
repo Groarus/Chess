@@ -32,7 +32,6 @@ public class MoveEngine {
             case KING:
                 return kingCheck(piece, toLocation, state);
         }
-
         return true;//temporarily, so other pieces can still be moved
     }
 
@@ -174,12 +173,11 @@ public class MoveEngine {
                     }
                 }
             }
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //Do nothing
+        } catch (ArrayIndexOutOfBoundsException ignore) {
         }
 
         //Moving diagonally with no one in between
-//Empty or enemy
+        //Empty or enemy
         return xDif == yDif && xDif == maxSpaces && endPiece.getColour() != piece.getColour();
     }
 
@@ -242,8 +240,6 @@ public class MoveEngine {
             return false;
         }
     }
-
-
 
 
     public LinkedList<Pair<Location, SpecialMove>> getPossibleMoves(Piece piece, State state) {

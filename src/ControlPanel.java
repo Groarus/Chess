@@ -25,6 +25,7 @@ public class ControlPanel extends JPanel {
         JButton saveButton = new JButton("Save");
         JButton quitButton = new JButton("Quit");
         JToggleButton modeButton = new JToggleButton("Free Mode");
+        final JLabel modeInfo = new JLabel("");
         final JLabel freeLabel = new JLabel("OFF");
 
         JPanel centerPanel = new JPanel(new FlowLayout());
@@ -35,8 +36,10 @@ public class ControlPanel extends JPanel {
         modePanel.add(modeButton);
         modePanel.add(freeLabel);
         centerPanel.add(modePanel);
+        JPanel modeInfoPanel = new JPanel(new GridLayout(1, 1));
+        modeInfoPanel.add(modeInfo);
+        centerPanel.add(modeInfoPanel);
         add(centerPanel, BorderLayout.CENTER);
-
 
         add(quitButton, BorderLayout.SOUTH);
 
@@ -46,7 +49,10 @@ public class ControlPanel extends JPanel {
                 JToggleButton btn = (JToggleButton) e.getSource();
                 freeMode = btn.getModel().isSelected();
                 String text = freeMode ? "ON" : "OFF";
+                String text2 = freeMode ? "<html><center>Left click to select<br>Right click to delete</center></html>" : "";
                 freeLabel.setText(text);
+                modeInfo.setText(text2);
+
                 player.setMode(freeMode);
                 player2.setMode(freeMode);
             }
@@ -70,7 +76,6 @@ public class ControlPanel extends JPanel {
 
             }
         });
-
     }
 
     public void setPlayer(HumanPlayer player) {
@@ -81,5 +86,4 @@ public class ControlPanel extends JPanel {
     public void setPlayer2(HumanPlayer player2) {
         this.player2 = player2;
     }
-
 }

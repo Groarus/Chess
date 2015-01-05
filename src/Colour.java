@@ -4,5 +4,5 @@
  * Created: December, 2014
  */
 public enum Colour {
-    WHITE, BLACK, NEUTRAL;
+    WHITE, BLACK, NEUTRAL
 }

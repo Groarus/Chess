@@ -22,7 +22,6 @@ public class Chess {
         Object[] options = {"Human vs. Computer", "Human vs. Human", "Load Game"};
         int choice = JOptionPane.showOptionDialog(null, "Choose your game type", "Colour Option", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
-
         switch (choice) {
             case 0:
                 SinglePlay(false, Colour.NEUTRAL);

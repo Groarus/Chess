@@ -79,15 +79,20 @@ public class HumanPlayer extends Player implements Runnable {
                                 if (selected.getName() != Piece.Name.EMPTY) {
                                     board.resetHighlight();
                                     if (move.move(selected, new Location(column, row), board)) { //MAIN MOVEMENT OF PLAYER
-                                        //    if (getColour() == Colour.WHITE ? board.getBlackPlayer() : board.getWhitePlayer() instanceof HumanPlayer)
-                                        if (getColour() == Colour.WHITE && board.getBlackPlayer() instanceof HumanPlayer && move.isInCheckmate(board, Colour.BLACK)) {
-                                            System.out.println("BLACK HUMAN IN CHECKMATE");
-                                        } else if (getColour() == Colour.BLACK && board.getWhitePlayer() instanceof HumanPlayer && move.isInCheckmate(board, Colour.WHITE)) {
-                                            System.out.println("WHITE HUMAN IN CHECKMATE");
-                                        } else if (getColour() == Colour.WHITE && board.getBlackPlayer() instanceof HumanPlayer && move.isInStalemate(board, Colour.BLACK)) {
-                                            System.out.println("BLACK HUMAN IN STALEMATE");
-                                        } else if (getColour() == Colour.BLACK && board.getWhitePlayer() instanceof HumanPlayer && move.isInStalemate(board, Colour.WHITE)) {
-                                            System.out.println("WHITE HUMAN IN STALEMATE");
+                                        gui.repaint(); //refreshes the board
+
+                                        if (getColour() == Colour.WHITE && move.isInCheckmate(board, Colour.BLACK)) {
+                                            JOptionPane.showMessageDialog(null, "White Wins! You have checkmated the opponent", "Game Over", JOptionPane.INFORMATION_MESSAGE);
+                                            System.exit(0);
+                                        } else if (getColour() == Colour.BLACK && move.isInCheckmate(board, Colour.WHITE)) {
+                                            JOptionPane.showMessageDialog(null, "Black Wins! You have checkmated the opponent", "Game Over", JOptionPane.INFORMATION_MESSAGE);
+                                            System.exit(0);
+                                        } else if (getColour() == Colour.WHITE && move.isInStalemate(board, Colour.BLACK)) {
+                                            JOptionPane.showMessageDialog(null, "Stalemate! Tie game", "Game Over", JOptionPane.INFORMATION_MESSAGE);
+                                            System.exit(0);
+                                        } else if (getColour() == Colour.BLACK && move.isInStalemate(board, Colour.WHITE)) {
+                                            JOptionPane.showMessageDialog(null, "Stalemate! Tie game", "Game Over", JOptionPane.INFORMATION_MESSAGE);
+                                            System.exit(0);
                                         }
                                         moveHistory.addMove(selected.getColour(), selected.getPrevLocation(), new Location(column, row)); //History
                                         gui.setBorder(panel, Color.darkGray, 1); //Info panel border
@@ -98,21 +103,31 @@ public class HumanPlayer extends Player implements Runnable {
                                 }
                             }
                         } else { //Free Move Mode
-                            if (board.getPiece(column, row) == selected) {
-                                board.resetHighlight();
-                                gui.repaint();
-                                selected = new Empty(); //deselect it
-                            } else if (board.getPiece(column, row).getColour() != Colour.NEUTRAL && selected.getColour() == Colour.NEUTRAL) {
-                                board.resetHighlight();
-                                selected = board.getPiece(column, row);
-                                selected.setLocation(new Location(column, row)); //setting the location of the piece as it is not set prior
-                                selected.setSelected(true);
-                                gui.repaint();
+                            if (mouseEvent.getButton() == MouseEvent.BUTTON1) {
+                                if (board.getPiece(column, row) == selected) {
+                                    board.resetHighlight();
+                                    gui.repaint();
+                                    selected = new Empty(); //deselect it
+                                } else if (board.getPiece(column, row).getColour() != Colour.NEUTRAL && selected.getColour() == Colour.NEUTRAL) {
+                                    board.resetHighlight();
+                                    selected = board.getPiece(column, row);
+                                    selected.setLocation(new Location(column, row)); //setting the location of the piece as it is not set prior
+                                    selected.setSelected(true);
+                                    gui.repaint();
+                                } else {
+                                    board.movePiece(selected.getLocation(), new Location(column, row));
+                                    board.resetHighlight();
+                                    gui.repaint();
+                                    selected = new Empty(); //deselect it
+                                }
                             } else {
-                                board.movePiece(selected.getLocation(), new Location(column, row));
+//                                moveEngine.move(new Empty(), new Location(column, row), board);
+                                board.getPieces(board.getPiece(new Location(column, row)).getColour()).removePiece(board.getPiece(new Location(column, row)));
+                                board.setPiece(column, row, new Empty());
+                                board.getWhitePlayer().setPiecesLeft(board.getWhitePieces().getAll().size());
+                                board.getBlackPlayer().setPiecesLeft(board.getBlackPieces().getAll().size());
                                 board.resetHighlight();
                                 gui.repaint();
-                                selected = new Empty(); //deselect it
                             }
                         }
                     }
