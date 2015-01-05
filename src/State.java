@@ -68,9 +68,14 @@ public class State {
     public void movePiece(Location startLocation, Location endLocation) {
         try {
             //Overtaking a piece
-            if (getPiece(endLocation).getColour() != getPiece(startLocation).getColour() && getPiece(endLocation).getColour() != Colour.NEUTRAL) {
+            if (getPiece(endLocation).getColour() != Colour.NEUTRAL) {
                 getPieces(getPiece(endLocation).getColour()).removePiece(getPiece(endLocation));
+                if (this instanceof Board) {
+                    getWhitePlayer().setPiecesLeft(getWhitePieces().getAll().size());
+                    getBlackPlayer().setPiecesLeft(getBlackPieces().getAll().size());
+                }
             }
+
 
             int startX = startLocation.getX(), startY = startLocation.getY(), endX = endLocation.getX(), endY = endLocation.getY();
             state[endX][endY] = state[startX][startY]; //move the piece
@@ -168,8 +173,11 @@ public class State {
         tempState.setState(temp);
         tempState.setWhitePlayer(this.whitePlayer);
         tempState.setBlackPlayer(this.blackPlayer);
-        tempState.setLastMoveStart(getLastMoveStart().clone());
-        tempState.setLastMoveEnd(getLastMoveEnd().clone());
+        try {
+            tempState.setLastMoveStart(getLastMoveStart().clone());
+            tempState.setLastMoveEnd(getLastMoveEnd().clone());
+        } catch (NullPointerException ignored) {
+        }
         tempState.setStatePieces();
         return tempState;
     }

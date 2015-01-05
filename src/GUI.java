@@ -32,7 +32,6 @@ public class GUI extends JFrame {
     public void startGUI() {
         setVisible(true);
         setResizable(false);
-        JOptionPane.showMessageDialog(this, "Left click to select. Right click to move.");
     }
 
 

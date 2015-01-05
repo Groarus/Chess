@@ -58,7 +58,7 @@ public class PaintBoard extends JPanel {
                     if (board.getPiece(i, j).isInCheck())
                         g.drawImage(inCheck, x, y, null);
                     g.drawImage(board.getPiece(i, j).getImage(), x, y, null);
-                } catch (NullPointerException e) {
+                } catch (NullPointerException ignored) {
                     //Do nothing - occurs when getting image of blank space on board
                 }
             }

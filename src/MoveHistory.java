@@ -46,9 +46,10 @@ public class MoveHistory {
         File file = new File(String.valueOf(fileDialog.getFile()));
         BufferedWriter output = new BufferedWriter(new FileWriter(file));
 
-        if (player1 instanceof ComputerPlayer)
-            output.write("CH\n");
-        else
+        if (player1 instanceof ComputerPlayer) {
+            output.write("CH\t" + player2.getColour().name() + "\n");
+
+        } else
             output.write("HH\n");
 
         for (String move : moves)
@@ -62,7 +63,7 @@ public class MoveHistory {
 
 
     public void loadGame() throws IOException {
-        FileDialog fileDialog = new FileDialog((Frame) null, "Save Game", FileDialog.LOAD);
+        FileDialog fileDialog = new FileDialog((Frame) null, "Load Game", FileDialog.LOAD);
         fileDialog.setVisible(true);
 
         File file = new File(String.valueOf(fileDialog.getFile()));

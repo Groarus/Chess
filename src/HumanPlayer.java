@@ -1,8 +1,10 @@
+import javafx.util.Pair;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.Stack;
+import java.util.LinkedList;
 
 
 /**
@@ -18,24 +20,12 @@ public class HumanPlayer extends Player implements Runnable {
     private MoveEngine move;
     private Boolean clickFlag = false;
     private MouseEvent mouseEvent;
-
-    public HumanPlayer(Colour colour, Board board, GUI gui, Turn turn, MoveHistory moveHistory, Boolean freePlay) {
-        super(colour, board, gui, turn, moveHistory);
-        System.out.println("Test so I can commit??");
-        this.move = new MoveEngine(moveHistory);
-        this.board = board;
-        this.freePlay = freePlay;
-        //set up the gui
-        infoPanel();
-        gui.addSidePanel(panel);
-        guiListener();
-    }
+    private Boolean freeMode = false;
 
     public HumanPlayer(Colour colour, Board board, GUI gui, Turn turn, MoveHistory moveHistory) {
         super(colour, board, gui, turn, moveHistory);
         this.move = new MoveEngine(moveHistory);
         this.board = board;
-        freePlay = false;
         //set up the gui
         infoPanel();
         gui.addSidePanel(panel);
@@ -45,13 +35,13 @@ public class HumanPlayer extends Player implements Runnable {
 
     @Override
     public void run() {
-        while (isRunning) {
+        while (true) {
             try {
-                Thread.sleep(150);
+                Thread.sleep(250);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            if (getTurn().getTurn() == getColour() || freePlay == true) {
+            if (getTurn().getTurn() == getColour()) {
                 gui.setBorder(panel, Color.red, 3);
                 if (clickFlag) {
                     int x = mouseEvent.getX();
@@ -75,32 +65,44 @@ public class HumanPlayer extends Player implements Runnable {
                         }
                     }
                     if (row != -1 && column != -1) {  //if row/column has actually been clicked
-                        //SELECT PIECE
-                        if (board.getPiece(column, row).getColour() == getColour()) {
-                            board.resetHighlight(); //clears all highlighted pieces
-                            moveEngine.highlightCheck(board); //highlight the king if in check
-                            selected = board.getPiece(column, row);
-                            selected.setLocation(new Location(column, row)); //setting the location of the piece as it is not set prior
-                            selected.setSelected(true);
-                            if (!freePlay) {
+                        if (!freeMode) {
+                            //SELECT PIECE
+                            if (board.getPiece(column, row).getColour() == getColour()) {
+                                board.resetHighlight(); //clears all highlighted pieces
+                                moveEngine.highlightCheck(board); //highlight the king if in check
+                                selected = board.getPiece(column, row);
+                                selected.setLocation(new Location(column, row)); //setting the location of the piece as it is not set prior
+                                selected.setSelected(true);
                                 possibleMove();
-                            }
-                            gui.repaint();
-                        } else { //MOVE PIECE
-                            if (selected.getName() != Piece.Name.EMPTY && selected.getColour() == getColour()) {
-                                board.resetHighlight();
-
-                                if (move.move(selected, new Location(column, row), board)) { //MAIN MOVEMENT OF PLAYER
-                                    if (!freePlay) {
+                                gui.repaint();
+                            } else { //MOVE PIECE
+                                if (selected.getName() != Piece.Name.EMPTY) {
+                                    board.resetHighlight();
+                                    if (move.move(selected, new Location(column, row), board)) { //MAIN MOVEMENT OF PLAYER
                                         moveHistory.addMove(selected.getColour(), selected.getPrevLocation(), new Location(column, row)); //History
+                                        gui.setBorder(panel, Color.darkGray, 1); //Info panel border
+                                        getTurn().next();
                                     }
-                                    gui.setBorder(panel, Color.darkGray, 1); //Info panel border
-                                    getTurn().next();
+                                    gui.repaint(); //refreshes the board
+                                    selected = new Empty(); //deselect it
                                 }
-
-                                gui.repaint(); //refreshes the board
+                            }
+                        } else { //Free Move Mode
+                            if (board.getPiece(column, row) == selected) {
+                                board.resetHighlight();
+                                gui.repaint();
                                 selected = new Empty(); //deselect it
-                                //      selected.setSelected(false);
+                            } else if (board.getPiece(column, row).getColour() != Colour.NEUTRAL && selected.getColour() == Colour.NEUTRAL) {
+                                board.resetHighlight();
+                                selected = board.getPiece(column, row);
+                                selected.setLocation(new Location(column, row)); //setting the location of the piece as it is not set prior
+                                selected.setSelected(true);
+                                gui.repaint();
+                            } else {
+                                board.movePiece(selected.getLocation(), new Location(column, row));
+                                board.resetHighlight();
+                                gui.repaint();
+                                selected = new Empty(); //deselect it
                             }
                         }
                     }
@@ -108,6 +110,10 @@ public class HumanPlayer extends Player implements Runnable {
                 }
             }
         }
+    }
+
+    public void setMode(Boolean mode) {
+        freeMode = mode;
     }
 
     private void infoPanel() {
@@ -192,10 +198,10 @@ public class HumanPlayer extends Player implements Runnable {
     }
 
     private void possibleMove() {
-        Stack<Location> possible = moveEngine.getPossibleMoves(selected, board);
+        LinkedList<Pair<Location, MoveEngine.SpecialMove>> possible = moveEngine.getPossibleMoves(selected, board);
 
-        while (!possible.isEmpty())
-            board.getPiece(possible.pop()).setPossibleMove(true);
+        for (Pair<Location, MoveEngine.SpecialMove> location : possible) {
+            board.getPiece(location.getKey()).setPossibleMove(true);
+        }
     }
-
 }

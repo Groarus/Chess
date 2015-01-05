@@ -13,7 +13,10 @@ public class Player {
     protected GUI gui;
     protected JLabel piecesLeftValue, numMovesValue;
     protected MoveHistory moveHistory;
-    private int numMoves = 0, piecesLeft = 16;
+    private int numMoves = 0;
+
+
+    private int piecesLeft = 16;
     private Colour colour;
     private Turn turn;
     protected boolean isRunning = true;
@@ -35,8 +38,8 @@ public class Player {
         return colour;
     }
 
-    public int getNumMoves() {
-        return numMoves;
+    public JPanel getPanel() {
+        return panel;
     }
 
     public void incrementMoves() {
@@ -44,12 +47,9 @@ public class Player {
         numMovesValue.setText(Integer.toString(numMoves));
     }
 
-    public void incPiecesLeft() {
-        this.piecesLeft++;
-    }
 
-    public void decPiecesLeft() {
-        this.piecesLeft--;
+    public void setPiecesLeft(int piecesLeft) {
+        this.piecesLeft = piecesLeft;
         piecesLeftValue.setText(Integer.toString(piecesLeft));
     }
 

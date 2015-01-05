@@ -1,4 +1,6 @@
-import java.util.Stack;
+import javafx.util.Pair;
+
+import java.util.LinkedList;
 
 /**
  * Project: Chess
@@ -8,7 +10,7 @@ import java.util.Stack;
 public class MoveEngine {
 
     private MoveHistory moveHistory;
-    private specialMove special;
+    private SpecialMove special;
 
     public MoveEngine(MoveHistory moveHistory) {
         this.moveHistory = moveHistory;
@@ -36,8 +38,8 @@ public class MoveEngine {
 
 
     public boolean move(Piece piece, Location toLocation, State state) {
-        special = specialMove.NONE;
-        if ((validateMove(piece, toLocation, state) && canMove(piece, toLocation, state)) || state.getWhitePlayer().getFreePlay()) {
+        special = SpecialMove.NONE;
+        if (validateMove(piece, toLocation, state) && canMove(piece, toLocation, state)) {
             boolean overtaken = false;
             switch (special) {
                 case ENPASSANT:
@@ -68,20 +70,12 @@ public class MoveEngine {
 
             }
 
-            if (state.getPiece(toLocation).getColour() != Colour.NEUTRAL && state.getPiece(toLocation).getColour() != piece.getColour())
-                overtaken = true;
 
             //increment number of moves and decrement pieces left if overtaken == true
-            if (piece.getColour() == Colour.WHITE) {
+            if (piece.getColour() == Colour.WHITE)
                 state.getWhitePlayer().incrementMoves();
-                if (overtaken) {
-                    state.getBlackPlayer().decPiecesLeft();
-                }
-            } else {
+            else
                 state.getBlackPlayer().incrementMoves();
-                if (overtaken)
-                    state.getWhitePlayer().decPiecesLeft();
-            }
             state.movePiece(piece.getLocation(), toLocation);
             return true;
         }
@@ -105,20 +99,20 @@ public class MoveEngine {
                 if ((piece.getColour() == Colour.BLACK && state.getPiece(toLocation.getX(), piece.getLocation().getY() - 1).getName() == Piece.Name.EMPTY) || (piece.getColour() == Colour.WHITE && state.getPiece(toLocation.getX(), piece.getLocation().getY() + 1).getName() == Piece.Name.EMPTY)) {
                     //Piece Promotion
                     if (toLocation.getY() == 0 || toLocation.getY() == 7)
-                        special = specialMove.PROMOTE;
+                        special = SpecialMove.PROMOTE;
                     return true;
                 }
             } else if (endPiece.getName() != Piece.Name.EMPTY && endPiece.getColour() != piece.getColour() && xDif == 1 && yDif == 1) { //Pawn Capture
                 //Piece Promotion
                 if (toLocation.getY() == 0 || toLocation.getY() == 7)
-                    special = specialMove.PROMOTE;
+                    special = SpecialMove.PROMOTE;
                 return true;
             } else if (endPiece.getColour() != piece.getColour() && xDif == 1 && yDif == 1) { //En Passant
                 Piece lastPiece = state.getPiece(moveHistory.lastMove());
                 if (piece.getPrevLocation() != null && lastPiece.getPrevLocation() != null)
                     if (Math.abs(lastPiece.getPrevLocation().getY() - lastPiece.getLocation().getY()) == 2 && lastPiece.getName() == Piece.Name.PAWN) // if the last move was a 2 jump and was a pawn
                         if (toLocation.getX() == lastPiece.getLocation().getX() && (Math.abs(toLocation.getY() - lastPiece.getLocation().getY()) == 1 && (Math.abs(toLocation.getY() - lastPiece.getPrevLocation().getY()) == 1))) {
-                            special = specialMove.ENPASSANT;
+                            special = SpecialMove.ENPASSANT;
                             return true;
                         }
             }
@@ -237,10 +231,10 @@ public class MoveEngine {
             return endPiece.getColour() != piece.getColour();
         } else if (piece.getPrevLocation() == null && yDif == 0 && xDif == 2) {
             if (state.getPiece(toLocation.getX() - 1, toLocation.getY()).getName() == Piece.Name.EMPTY && state.getPiece(toLocation.getX() + 1, toLocation.getY()).getName() == Piece.Name.ROOK) {
-                special = specialMove.CASTLE1;
+                special = SpecialMove.CASTLE1;
                 return true;
             } else if (state.getPiece(toLocation.getX() - 1, toLocation.getY()).getName() == Piece.Name.EMPTY && state.getPiece(toLocation.getX() + 1, toLocation.getY()).getName() == Piece.Name.EMPTY && state.getPiece(toLocation.getX() - 2, toLocation.getY()).getName() == Piece.Name.ROOK) {
-                special = specialMove.CASTLE2;
+                special = SpecialMove.CASTLE2;
                 return true;
             }
             return false;
@@ -325,13 +319,14 @@ public class MoveEngine {
 //    }
 
 
-    public Stack<Location> getPossibleMoves(Piece piece, State state) {
-        Stack<Location> possible = new Stack<Location>();
+    public LinkedList<Pair<Location, SpecialMove>> getPossibleMoves(Piece piece, State state) {
+        LinkedList<Pair<Location, SpecialMove>> possible = new LinkedList<Pair<Location, SpecialMove>>();
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 Location temp = new Location(i, j);
+                special = SpecialMove.NONE;
                 if ((state.getPiece(temp).getColour() != piece.getColour()) && validateMove(piece, temp, state) && canMove(piece, temp, state)) {
-                    possible.push(temp);
+                    possible.add(new Pair<Location, SpecialMove>(temp, special));
                 }
             }
         }
@@ -348,7 +343,7 @@ public class MoveEngine {
             tempKing.setInCheck(true);
     }
 
-    private boolean isInCheck(Colour colour, State state) {
+    public boolean isInCheck(Colour colour, State state) {
         try {
             Location kingLocation = state.getPieces(colour).getKing().peek().getLocation();
 
@@ -359,8 +354,7 @@ public class MoveEngine {
                     return true;
                 }
             }
-        } catch (NullPointerException e) {
-            System.out.println("isincheck no king");
+        } catch (NullPointerException ignored) {
         }
         return false;
     }
@@ -394,18 +388,25 @@ public class MoveEngine {
             blackMobility += getPossibleMoves(piece, state).size();
         blackMaterial += 0.1 * blackMobility;
 
+        //special things
+        if (colour == Colour.WHITE && whiteMobility == 0) {//checkmate
+            return Double.POSITIVE_INFINITY;
+        } else if (colour == Colour.BLACK && blackMobility == 0) { //checkmate
+            return Double.POSITIVE_INFINITY;
+        }
+
         return colour == Colour.WHITE ? whiteMaterial - blackMaterial : blackMaterial - whiteMaterial;
     }
 
     private boolean canMove(Piece piece, Location toLocation, State state) {
         TempMove tempMove = new TempMove(piece, state);
-        tempMove.move(toLocation);
+        tempMove.move(toLocation, SpecialMove.NONE);
         Boolean ret = !isInCheck(piece.getColour(), state);
         tempMove.undoMove();
         return ret;
     }
 
-    private enum specialMove {
+    public enum SpecialMove {
         ENPASSANT, CASTLE1, CASTLE2, PROMOTE, NONE
     }
 }

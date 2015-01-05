@@ -11,13 +11,10 @@ import java.io.IOException;
  */
 public class ControlPanel extends JPanel {
 
-    private MoveHistory moveHistory;
-    private Player player1, player2;
-    public ControlPanel(final MoveHistory moveHistory, Player p1, Player p2, Boolean inFreePlay) {
-        System.out.println("Test so I can commit??");
-        player1 = p1;
-        player2 = p2;
-        this.moveHistory = moveHistory;
+    private Boolean freeMode = false;
+    private HumanPlayer player, player2;
+
+    public ControlPanel(final MoveHistory moveHistory) {
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createLineBorder(Color.black, 3));
 
@@ -27,16 +24,33 @@ public class ControlPanel extends JPanel {
 
         JButton saveButton = new JButton("Save");
         JButton quitButton = new JButton("Quit");
-        JButton convertButton = new JButton("Convert");
+        JToggleButton modeButton = new JToggleButton("Free Mode");
+        final JLabel freeLabel = new JLabel("OFF");
 
         JPanel centerPanel = new JPanel(new FlowLayout());
+        JPanel modePanel = new JPanel(new GridLayout(2, 2, 25, 15));
         centerPanel.add(saveButton);
-        if (inFreePlay) {
-            centerPanel.add(convertButton);
-        }
+        modePanel.add(new Label());
+        modePanel.add(new Label());
+        modePanel.add(modeButton);
+        modePanel.add(freeLabel);
+        centerPanel.add(modePanel);
         add(centerPanel, BorderLayout.CENTER);
 
+
         add(quitButton, BorderLayout.SOUTH);
+
+        modeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JToggleButton btn = (JToggleButton) e.getSource();
+                freeMode = btn.getModel().isSelected();
+                String text = freeMode ? "ON" : "OFF";
+                freeLabel.setText(text);
+                player.setMode(freeMode);
+                player2.setMode(freeMode);
+            }
+        });
 
         quitButton.addActionListener(new ActionListener() {
             @Override
@@ -57,20 +71,15 @@ public class ControlPanel extends JPanel {
             }
         });
 
-        convertButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    player1.kill();
-                    player2.kill();
-                } catch (Exception e1) {
-                    e1.printStackTrace();
-                }
-
-            }
-        });
-
     }
 
+    public void setPlayer(HumanPlayer player) {
+        this.player = player;
+        this.player2 = player;
+    }
+
+    public void setPlayer2(HumanPlayer player2) {
+        this.player2 = player2;
+    }
 
 }
