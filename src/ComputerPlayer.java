@@ -96,6 +96,7 @@ public class ComputerPlayer extends Player implements Runnable {
                 evaluationValue.setText(String.format("%.3f", evaluation));
 
                 //If there is no best move
+
                 while (bestMove[ply] == null && ply > 0){
                     ply--;
                     bestMove = new TempMove[ply + 1];
@@ -105,6 +106,7 @@ public class ComputerPlayer extends Player implements Runnable {
                 }
 
                 if (bestMove[ply] != null) {
+                    System.out.println("Hit");
                     Location start = bestMove[ply].getStartLocation();
                     Location end = bestMove[ply].getToLocation();
 
@@ -114,6 +116,10 @@ public class ComputerPlayer extends Player implements Runnable {
                     board.getPiece(board.getLastMoveEnd()).setSelected(true); //select the newly moved piece
                     moveEngine.highlightCheck(board); //in check checker
                 }
+
+                gui.setBorder(panel, Color.darkGray, 1); //Info panel border
+                gui.repaint();
+                getTurn().next();
 
                 if (getColour() == Colour.WHITE && moveEngine.isInCheckmate(board, Colour.BLACK)) {
                     JOptionPane.showMessageDialog(null, "White Wins! You have checkmated the opponent", "Game Over", JOptionPane.INFORMATION_MESSAGE);
@@ -128,9 +134,7 @@ public class ComputerPlayer extends Player implements Runnable {
                     JOptionPane.showMessageDialog(null, "Stalemate! Tie game", "Game Over", JOptionPane.INFORMATION_MESSAGE);
                     System.exit(0);
                 }
-                gui.setBorder(panel, Color.darkGray, 1); //Info panel border
-                gui.repaint();
-                getTurn().next();
+
             }
         }
     }
