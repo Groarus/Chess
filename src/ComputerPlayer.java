@@ -106,7 +106,6 @@ public class ComputerPlayer extends Player implements Runnable {
                 }
 
                 if (bestMove[ply] != null) {
-                    System.out.println("Hit");
                     Location start = bestMove[ply].getStartLocation();
                     Location end = bestMove[ply].getToLocation();
 
